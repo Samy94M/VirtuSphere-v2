@@ -1,0 +1,15 @@
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.exe.config
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.exe
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.pdb
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.csproj.AssemblyReference.cache
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.FMmain.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.Properties.Resources.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.csproj.GenerateResource.cache
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.csproj.CoreCompileInputs.cache
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.exe
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.pdb
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.LoginForm.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.LogForm.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Newtonsoft.Json.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Newtonsoft.Json.xml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSph.31DFAD95.Up2Date
