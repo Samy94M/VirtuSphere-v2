@@ -4,76 +4,450 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using static VirtuSphere.ApiService;
 
 
 namespace VirtuSphere
 {
     public partial class FMmain : Form
     {
+
+        public string hostname { get; set; }
+        public string Token { get; set; }
+        public int missionId { get; set; }
+        public string missionName { get; set; }
+        public ApiService ApiService { get; set; }
+        public List<VM> vms = new List<VM>();
+        public List<VM> vmListToDelete = new List<VM>();
+        public List<VM> vmListToCreate = new List<VM>();
+        public List<VM> vmListToUpdate = new List<VM>();
+        public List<MissionItem> missionItems = new List<MissionItem>();
+
+
+
         public object JsonConvert { get; private set; }
-        public string Token { get; private set; }
 
         public FMmain()
         {
+
+
             InitializeComponent();
 
+            DisableInputFields();
 
-            comboVLAN.Items.Add("Item 1");
-            comboVLAN.Items.Add("Item 2");
-            comboVLAN.Items.Add("Item 3");
-
-            comboVLAN.SelectedIndex = 0;
-
-
-            MessageBox.Show("Token: " + Token);
-
-
-
-            // fülle listBox1 mit 50 testdaten
-            for (int i = 0; i < 50; i++)
+        }
+        public async void btn_loadVMsfromDB(object sender, EventArgs e)
+        {
+            if(missionBox.SelectedIndex != -1)
             {
-                listBox1.Items.Add("Item " + i);
+                MissionItem selectedItem = missionBox.SelectedItem as MissionItem;
+                if (selectedItem != null)
+                {
+                    //MessageBox.Show($"Die ID der ausgewählten Mission ist: {selectedItem.Id}");
+
+                   // DialogResult result = MessageBox.Show("Möchten Sie die Liste der VMs aus der Datenbank laden?", "Bestätigung", MessageBoxButtons.YesNo);
+
+                  //  if (result == DialogResult.Yes)
+                   // {
+                        // leere listView1 und fülle sie mit den VMs aus der Datenbank
+                        listView1.Items.Clear();
+                        ClearTextBoxes();
+
+                        missionId = selectedItem.Id;
+                        missionName = selectedItem.mission_name;
+
+                        // enable btn_add
+                        if (missionId != 0) { btn_add.Enabled = true; EnableInputFields(); }
+
+                       // MessageBox.Show("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
+                        Console.WriteLine("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
+
+                        // leere vms 
+                        vms.Clear();
+                        vms = await ApiService.GetVMs(hostname, Token, missionId);
+
+                        if (vms != null && vms.Count > 0)
+                        {
+                            UpdateListView(vms);
+                            EnableInputFields();
+                            Console.WriteLine("Insgesamt " + vms.Count + " VMs gefunden.");
+
+                            // Alle VMs in der Console ausgeben
+                            foreach (VM vm in vms)
+                            {
+                                Console.WriteLine(vm.vm_name);
+                            }
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Keine VMs für "+selectedItem.mission_name+" in der Datenbank gefunden.");
+                        }
+
+                   // }
+                }
+                else
+                {
+                    MessageBox.Show("Mission kann nicht geladen werden, weil die noch nicht in der Datenbank angelegt wurde.");
+                }
+            }
+        }
+        private void btnAddClick(object sender, EventArgs e)
+        {
+            string packages = "";
+            foreach (var item in listBoxPackages.SelectedItems)
+            {
+                packages += item.ToString() + ";";
+                Console.WriteLine("Selected Packages Item für: " + txtName.Text + " " + item.ToString());
+            }
+
+            // Create a new VM object with the entered values
+            VM vm = new VM
+            {
+                vm_name = txtName.Text,
+                vm_hostname = txtHostname.Text,
+                vm_ip = txtIP.Text,
+                vm_subnet = txtSubnet.Text,
+                vm_gateway = txtGateway.Text,
+                vm_dns1 = txtDNS1.Text,
+                vm_dns2 = txtDNS2.Text,
+                vm_domain = txtDomain.Text,
+                vm_vlan = comboVLAN.Text,
+                vm_os = listBoxOS.Text,
+                vm_packages = packages,
+                vm_status = "Neu - DB Sync!"
+
+            };
+
+            if (ValidateInputFields(vm))
+            {
+                // Add the VM object to the vms list
+                vms.Add(vm);
+                vmListToCreate.Add(vm);
+
+                LoadVMsIntoListView(vms);
+                ClearTextBoxes();
+                DisableButtons();
             }
         }
 
-  
-
-        // erstelle eine methode zum leeren der textfelder
-        private void ClearTextBoxes()
+        private bool ValidateInputFields(VM vm)
         {
-            txtHostname.Text = "";
-            txtIP.Text = "";
-            txtSubnet.Text = "";
-            txtGateway.Text = "";
-            txtDNS1.Text = "";
-            txtDNS2.Text = "";
-            txtDomain.Text = "";
-            comboVLAN.SelectedIndex = 0;
-            listBox1.SelectedItems.Clear();
+            if (string.IsNullOrWhiteSpace(vm.vm_name) || string.IsNullOrWhiteSpace(vm.vm_hostname))
+            {
+                MessageBox.Show("Name und Hostname dürfen nicht leer sein.");
+                return false;
+            }
+
+            if (!IPAddress.TryParse(vm.vm_ip, out _) || !IPAddress.TryParse(vm.vm_subnet, out _) ||
+                !IPAddress.TryParse(vm.vm_gateway, out _) || !IPAddress.TryParse(vm.vm_dns1, out _) ||
+                !IPAddress.TryParse(vm.vm_dns2, out _))
+            {
+                MessageBox.Show("Eine oder mehrere IP-Adressen sind ungültig.");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(vm.vm_os))
+            {
+                MessageBox.Show("Bitte wähle ein Betriebssystem aus.");
+                return false;
+            }
+
+            return true;
         }
 
-        // erstelle eine methode zum aktivieren /deaktivieren der buttons
-        private void EnableButtons()
+        private bool ValidateDoubleItems(ListView listView, string newItem)
         {
-            btn_delete.Enabled = true;
-            btn_edit.Enabled = true;
-            btn_clear.Enabled = true;
+            foreach (ListViewItem item in listView.Items)
+            {
+                if (item.Text == newItem)
+                {
+                    MessageBox.Show("Dieser Eintrag existiert bereits.");
+                    return false;
+                }
+            }
+            return true;
         }
 
-        // erstelle eine methode zum deaktivieren der buttons
-        private void DisableButtons()
+        public Task LoadVMsIntoListView(List<VM> vms)
         {
-            btn_delete.Enabled = false;
-            btn_edit.Enabled = false;
-            btn_clear.Enabled = false;
+            // Clear the listView1
+            listView1.Items.Clear();
+
+            // Iterate through the vms list and add each VM to the listView1
+            foreach (var vm in vms)
+            {
+                ListViewItem lvi = new ListViewItem(new[] {
+                    vm.vm_name,
+                    vm.vm_hostname,
+                    vm.vm_ip,
+                    vm.vm_subnet,
+                    vm.vm_gateway,
+                    vm.vm_dns1,
+                    vm.vm_dns2,
+                    vm.vm_domain,
+                    vm.vm_vlan,
+                    vm.vm_os,
+                    vm.vm_role,
+                    vm.vm_status
+                });
+
+                listView1.Items.Add(lvi);
+
+
+                lvi.Tag = vm;
+            }
+
+            return Task.CompletedTask;
         }
 
-        // erstelle eine methode zum export der listView1 in eine CSV-Datei
+        private void btnEditClick(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+
+                VM selectedVM = listView1.SelectedItems[0].Tag as VM; // Cast das Tag zurück zum VM-Objekt
+                if (selectedVM != null)
+                {
+                    // Zeige jetzt Informationen aus dem VM-Objekt an, z.B.:
+                   // MessageBox.Show($"ID: {selectedVM.Id}\nName: {selectedVM.vm_name}\nIP: {selectedVM.vm_ip}\nOS: {selectedVM.vm_os}");
+
+                    // Bearbeite hier das Objekt in der Klasse vms
+                    selectedVM.vm_name = txtName.Text;
+                    selectedVM.vm_hostname = txtHostname.Text;
+                    selectedVM.vm_ip = txtIP.Text;
+                    selectedVM.vm_subnet = txtSubnet.Text;
+                    selectedVM.vm_gateway = txtGateway.Text;
+                    selectedVM.vm_dns1 = txtDNS1.Text;
+                    selectedVM.vm_dns2 = txtDNS2.Text;
+                    selectedVM.vm_domain = txtDomain.Text;
+                    selectedVM.vm_vlan = comboVLAN.Text;
+                    selectedVM.vm_os = listBoxOS.Text;
+                    selectedVM.vm_status = "geändert - DB Sync!";
+
+                    // Ausgewählte listBoxPackages Objekte sollen mit Semikolon getrennt in vm_packages gespeichert werden
+                    string packages = "";
+                    foreach (var item in listBoxPackages.SelectedItems)
+                    {
+                        packages += item.ToString() + ";";
+                        Console.WriteLine("Selected Packages Item für: "+selectedVM.vm_name+" " + item.ToString());
+                    }
+                    selectedVM.vm_packages = packages;
+
+                    if (selectedVM.Id != 0)
+                    {
+                        vmListToUpdate.Add(selectedVM);
+                    }
+
+                    // Update the listView1
+                    UpdateListView(vms);
+                }
+
+
+                ClearTextBoxes();
+                DisableButtons();
+            }
+
+        }
+        void VMList_Click(object sender, EventArgs e)
+        {
+            // gib id aus
+            if (listView1.SelectedItems.Count > 0)
+            {
+                VM selectedVM = listView1.SelectedItems[0].Tag as VM; // Cast das Tag zurück zum VM-Objekt
+                if (selectedVM != null)
+                {
+                    // Zeige jetzt Informationen aus dem VM-Objekt an, z.B.:
+                    //MessageBox.Show($"ID: {selectedVM.Id}\nName: {selectedVM.vm_name}\nIP: {selectedVM.vm_ip}\nOS: {selectedVM.vm_os}");
+                    txtName.Text = selectedVM.vm_name;
+                    txtHostname.Text = selectedVM.vm_hostname;
+                    txtIP.Text = selectedVM.vm_ip;
+                    txtSubnet.Text = selectedVM.vm_subnet;
+                    txtGateway.Text = selectedVM.vm_gateway;
+                    txtDNS1.Text = selectedVM.vm_dns1;
+                    txtDNS2.Text = selectedVM.vm_dns2;
+                    txtDomain.Text = selectedVM.vm_domain;
+                    comboVLAN.Text = selectedVM.vm_vlan;
+                    listBoxOS.Text = selectedVM.vm_os;
+                    listBoxPackages.ClearSelected();
+
+                    // selectedVM.packages in listBoxPackages eintragen
+                    string[] packages = selectedVM.vm_packages.Split(';');
+
+                    List<object> itemsToAdd = new List<object>();
+                    foreach (var item in listBoxPackages.Items)
+                    {
+                        if (packages.Contains(item.ToString()))
+                        {
+                            itemsToAdd.Add(item);
+                        }
+                    }
+
+                    foreach (var item in itemsToAdd)
+                    {
+                        listBoxPackages.SelectedItems.Add(item);
+                    }
+
+                        EnableButtons();
+                }
+                else
+                {
+                    // liste mir hier alle Objekte in vms auf
+                    MessageBox.Show("Fehler beim Laden der VM-Daten.");
+
+                    foreach (var vm in vms)
+                    {
+                        Console.WriteLine("VM-Objekt in der Klasse vms: " + vm.vm_name);
+                        //console zeige tag
+                        Console.WriteLine("Selected Tag: " + listView1.SelectedItems[0].Tag);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie eine VM aus.");
+            }
+        }
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            // lösche das ausgewählte Item aus der ListView und macht die Textboxen leer
+            if (listView1.SelectedItems.Count > 0)
+            {
+                //listView1.Items.Remove(listView1.SelectedItems[0]);
+                VM selectedVM = listView1.SelectedItems[0].Tag as VM; // Cast das Tag zurück zum VM-Objekt
+                if (selectedVM != null)
+                {
+                    // Frage ob wirklich gelöscht werden soll
+                    DialogResult result = MessageBox.Show("Möchten Sie die VM "+(selectedVM.vm_name)+" #"+(selectedVM.Id)+" löschen?", "Bestätigung", MessageBoxButtons.YesNo);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        // Entferne das VM-Objekt aus der Liste vms
+                        vms.Remove(selectedVM);
+                        vmListToDelete.Add(selectedVM);
+
+                        // Update the listView1
+                        UpdateListView(vms);
+                    }
+                }
+                ClearTextBoxes();
+                DisableButtons();
+            }
+        }
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            ClearTextBoxes();
+            DisableButtons();
+
+        }
+        private void btnCSVExportClick(object sender, EventArgs e)
+        {
+            // exportiere die ListView in eine CSV-Datei
+            ExportToCSV();
+        }
+        private void btnCSVImportClick(object sender, EventArgs e)
+        {
+            // importiere eine CSV-Datei in die ListView
+            ImportFromCSV();
+        }
+        private void btnOpenLogsWindowsClick(object sender, EventArgs e)
+        {
+            // öffne das LogForm und füge eine Log-Nachricht hinzu (dies ist nur ein Beispiel) 
+            LogForm logForm = new LogForm();
+            logForm.AddLog("Dies ist eine Log-Nachricht.");
+            logForm.ShowDialog();
+
+
+        }
+        private async void btnDeleteMissionClick(object sender, EventArgs e)
+        {
+
+            if (missionBox.SelectedIndex != -1)
+            {
+                MissionItem selectedItem = missionBox.SelectedItem as MissionItem;
+                if (selectedItem != null)
+                {
+                    //MessageBox.Show($"Die ID der ausgewählten Mission ist: {selectedItem.Id}");
+
+                    // Bestätigungsdialog anzeigen
+                    DialogResult result = MessageBox.Show("Möchten Sie die Mission "+missionName+" wirklich löschen?", "Bestätigung", MessageBoxButtons.YesNo);
+                    if(result == DialogResult.No) { return; }
+
+                    DialogResult result2 = MessageBox.Show("Ganz Sicher?", "Bestätigung", MessageBoxButtons.YesNo);
+                    if (result2 == DialogResult.No) { return; }
+
+                    DialogResult result3 = MessageBox.Show("Gannnnnz Sicher?", "Bestätigung", MessageBoxButtons.YesNo);
+
+
+                    if (result == DialogResult.Yes && result2 == DialogResult.Yes && result3 == DialogResult.Yes)
+                    {
+                        bool isSuccess = await ApiService.DeleteMission(hostname, Token, missionId);
+
+                        if (isSuccess)
+                        {
+                            MessageBox.Show("Mission erfolgreich gelöscht.");
+
+                            // missionBox leeren und neu laden
+                            missionBox.Items.Clear();
+                            missionBox.Text = "";
+                            List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
+                            ShowMissions(missionsList);
+
+                            //listView1.Clear();
+                            //vms.Clear();
+
+                        }
+                        else
+                        {
+                            MessageBox.Show("Fehler beim Löschen der Mission.");
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public void DisableInputFields()
+        {
+            txtName.Enabled = false;
+            txtHostname.Enabled = false;
+            txtIP.Enabled = false;
+            txtSubnet.Enabled = false;
+            txtGateway.Enabled = false;
+            txtDNS1.Enabled = false;
+            txtDNS2.Enabled = false;
+            txtDomain.Enabled = false;
+            comboVLAN.Enabled = false;
+            listBoxOS.Enabled = false;
+            listBoxPackages.Enabled = false;
+            btn_add.Enabled = false;
+        }
+
+        public void EnableInputFields()
+        {
+            txtName.Enabled = true;
+            txtHostname.Enabled = true;
+            txtIP.Enabled = true;
+            txtSubnet.Enabled = true;
+            txtGateway.Enabled = true;
+            txtDNS1.Enabled = true;
+            txtDNS2.Enabled = true;
+            txtDomain.Enabled = true;
+            comboVLAN.Enabled = true;
+            listBoxOS.Enabled = true;
+            listBoxPackages.Enabled = true;
+            btn_add.Enabled = true;
+        }
+
         private void ExportToCSV()
         {
             // erstelle einen neuen SaveFileDialog
@@ -97,8 +471,6 @@ namespace VirtuSphere
                 System.IO.File.WriteAllText(sfd.FileName, sb.ToString());
             }
         }
-
-        // erstelle eine methode zum import einer CSV-Datei in die ListView. Überspringe die Erste Line
         private void ImportFromCSV()
         {
             // erstelle einen neuen OpenFileDialog
@@ -128,234 +500,432 @@ namespace VirtuSphere
                 }
             }
         }
-
-        // ...
-
-        // schreibe eine methode die http://localhost:8080/access.php?action=getMissions&token=your_token aufruft (json) und die daten in comboBox2 lädt
-        private async void LoadMissions(string Token, string Hostname)
+        private void DisableButtons()
         {
-            MessageBox.Show("LoadMissions: " + Token);
+            btn_delete.Enabled = false;
+            btn_edit.Enabled = false;
+            btn_clear.Enabled = false;
+        }
+        private void EnableButtons()
+        {
+            btn_delete.Enabled = true;
+            btn_edit.Enabled = true;
+            btn_clear.Enabled = true;
+        }
+        private void ClearTextBoxes()
+        {
+            txtName.Text = "";
+            txtHostname.Text = "";
+            txtIP.Text = "";
+            txtSubnet.Text = "";
+            txtGateway.Text = "";
+            txtDNS1.Text = "";
+            txtDNS2.Text = "";
+            txtDomain.Text = "";
+            listBoxPackages.SelectedItems.Clear();
+            txtDomain.Text = "";
+            comboVLAN.Text = "";
+            listBoxOS.Text = "";
 
-            using (HttpClient client = new HttpClient())
+        }
+        public void ShowPackages(List<PackageItem> packagesList)
+        {
+            // Stelle sicher, dass listBoxPackages die ListBox ist, die du in deiner Form hast.
+            listBoxPackages.Items.Clear(); // Bestehende Einträge löschen
+
+            if (packagesList != null && packagesList.Any())
             {
-                // Füge den Token hinzu
-                client.DefaultRequestHeaders.Add("token", Token);
-
-                try
+                foreach (var package in packagesList)
                 {
-                    // Rufe die URL asynchron auf
-                    string response = await client.GetStringAsync("http://" + Hostname + "/access.php?action=getMissions");
-
-                    // Deserialisiere die JSON-Daten
-                    dynamic missions = JsonConvert.DeserializeObject(response);
-
-                    // Füge die Daten in comboBox2 ein
-                    foreach (var mission in missions)
-                    {
-                        comboBox2.Items.Add((string)mission.name);
-                    }
+                    listBoxPackages.Items.Add(package); // Füge jedes Package zur ListBox hinzu
                 }
-                catch (Exception ex)
+            }
+            else
+            {
+                listBoxPackages.Items.Add("Keine Pakete verfügbar.");
+            }
+        }
+        public void ShowOS(List<OSItem> osList)
+        {
+            listBoxOS.Items.Clear();
+
+            if (osList != null && osList.Any())
+            {
+                foreach (var os in osList)
                 {
-                    MessageBox.Show("Fehler beim Laden der Missionen: " + ex.Message);
+
+                    listBoxOS.Items.Add(os); // Fügt das OSItem direkt hinzu
                 }
+            }
+            else
+            {
+                listBoxOS.Items.Add("Keine OS verfügbar.");
+            }
+        }
+        public void ShowMissions(List<MissionItem> missionsList)
+        {
+            // Stelle sicher, dass listBoxMissions die ListBox ist, die du in deiner Form hast.
+            missionBox.Items.Clear(); // Bestehende Einträge löschen
+
+            if (missionsList != null && missionsList.Any())
+            {
+                foreach (var mission in missionsList)
+                {
+                    missionBox.Items.Add(new MissionItem(mission.Id, mission.mission_name, mission.vm_count));
+                }
+            }
+            else
+            {
+                missionBox.Items.Add("Keine Missionen verfügbar.");
+            }
+        }
+        public void ShowVLANs(List<VLANItem> vlanList)
+        {
+            comboVLAN.Items.Clear();
+
+            if (vlanList != null && vlanList.Any())
+            {
+                foreach (var vlan in vlanList)
+                {
+                    comboVLAN.Items.Add(vlan); // Fügt das VLANItem direkt hinzu
+                }
+            }
+            else
+            {
+                comboVLAN.Items.Add("Keine VLANs verfügbar.");
+            }
+        }
+        private async void SaveVMsinMission_Click(object sender, EventArgs e)
+        {
+            MissionItem selectedItem = missionBox.SelectedItem as MissionItem;
+            if (selectedItem != null)
+            {
+                
+                foreach (var vm in vmListToCreate)
+                {
+                    Console.WriteLine("Mission ID: " + missionId);
+                    Console.WriteLine("Neue VM: " + vm.vm_name);
+                }
+
+                foreach (var vm in vmListToDelete)
+                {
+                    Console.WriteLine("Mission ID: " + missionId);
+                    Console.WriteLine("VM zum Löschen: " + vm.vm_name);
+                }
+
+                foreach (var vm in vmListToUpdate)
+                {
+                    Console.WriteLine("Mission ID: " + missionId);
+                    Console.WriteLine("VM zum Updaten: " + vm.vm_name);
+                }
+                bool isSuccess = true;
+                bool isSuccess2 = true;
+                bool isSuccess3 = true;
+
+                if (vmListToCreate.Count > 0) { isSuccess = await ApiService.VmListToWebAPI("vmListToCreate", hostname, Token, missionId, vmListToCreate); }
+                if(vmListToDelete.Count > 0) { isSuccess2 = await ApiService.VmListToWebAPI("vmListToDelete", hostname, Token, missionId, vmListToDelete); }
+                if(vmListToUpdate.Count > 0) { isSuccess3 = await ApiService.VmListToWebAPI("vmListToUpdate", hostname, Token, missionId, vmListToUpdate); }
+
+
+                if (isSuccess && isSuccess2 && isSuccess3)
+                {
+                    MessageBox.Show("Neue VMs: " + vmListToCreate.Count + " - Updated " + vmListToUpdate.Count + " Übertragen und " + vmListToDelete.Count + " gelöscht");
+                }
+                else
+                {
+                    MessageBox.Show("Fehlgeschlagen");
+                }
+
+                // Leere vmListToCreate, vmListToDelete und vmListToUpdate
+                vmListToCreate.Clear();
+                vmListToDelete.Clear();
+                vmListToUpdate.Clear();
+
+
+                // lad missionbox neu
+                missionBox.Text = "";
+                missionBox.Items.Clear();
+                List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
+                ShowMissions(missionsList);
+
+                // entferne aktuelle auswahl und wähle neu aus
+                selectMission(missionName + " (" + vms.Count + ")");
+
+                // Lade ListView1 neu
+                vms.Clear();
+                vms = await ApiService.GetVMs(hostname, Token, missionId);
+
+                if (vms != null && vms.Count > 0)
+                {
+                    UpdateListView(vms);
+                    EnableInputFields();
+                }
+            }
+            else if (missionBox.Text != "")
+            {
+                string missionName2 = missionBox.Text;
+                CreateMission(missionName2);
+
+                // lade die Missionen neu und wähle neu erstellte Mission aus
+                missionBox.Items.Clear();
+                List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
+
+                // wähle die neu erstellte Mission aus
+                ShowMissions(missionsList);
+                selectMission(missionName2 + " (0)");
+                EnableInputFields();
+            }
+            else
+            {
+                MessageBox.Show("Bitte wählen Sie eine Mission aus oder geben Sie einen Namen ein.");
             }
         }
 
-
-        // schreibe eine methode die http://localhost:8080/access.php?action=getPackages&token=your_token aufruft (json) und in listBox1 lädt
-        private void LoadPackages(String Token, String Hostname)
+        private void selectMission(string SucheWert)
         {
-            MessageBox.Show("LoadPackages" + Token);
+            var obj = missionBox.Items.Cast<object>().FirstOrDefault(item => item.ToString() == SucheWert);
 
-
-            // erstelle eine neue Instanz von HttpClient
-            HttpClient client = new HttpClient();
-            // füge den token hinzu
-            client.DefaultRequestHeaders.Add("token", Token);
-            // rufe die URL auf
-            string response = client.GetStringAsync("http://"+Hostname+"/access.php?action=getPackages").Result;
-            // deserialisiere die JSON-Daten
-            dynamic packages = JsonConvert.DeserializeObject(response);
-            // füge die Daten in listBox1 ein
-            foreach (var package in packages)
+            // Wenn ein entsprechendes Objekt gefunden wurde, wähle es aus
+            if (obj != null)
             {
-                listBox1.Items.Add(package.name);
+                missionBox.SelectedItem = obj;
+            }
+            else
+            {
+                Console.WriteLine("Kein passendes Objekt für MissionSelect gefunden für: " + SucheWert);
+
+                // gib hier alle werte von missionBox aus
+                Console.WriteLine("Alle Werte von missionBox:");
+
+                foreach (var item in missionBox.Items)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+                Console.WriteLine("Ende der Werte von missionBox.");
+
+            }
+        }
+        private async void CreateMission(string missionName)
+        {
+            bool isSuccess = await ApiService.CreateMission(hostname, Token, missionName);
+
+            if (isSuccess)
+            {
+                MessageBox.Show("Mission erfolgreich erstellt.");
+                // missionBox leeren und neu laden
+                missionBox.Items.Clear();
+                List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
+
+                ShowMissions(missionsList);
+
+                selectMission(missionName + " (0)");
+
+
+            }
+            else
+            {
+                MessageBox.Show("Fehler beim Speichern der Mission.");
+                
             }
         }
 
-        // schreibe eine methode die http://localhost:8080/access.php?action=getVMS&mission=(comboBox2.text)&token=your_token aufruft (json) und in listView1 lädt
-        private void LoadVMS(String Token, String Hostname)
+        private void UpdateListView(List<VM> vms)
         {
-            // erstelle eine neue Instanz von HttpClient
-            HttpClient client = new HttpClient();
-            // füge den token hinzu
-            client.DefaultRequestHeaders.Add("token", Token);
-            // rufe die URL auf
-            string response = client.GetStringAsync("http://"+Hostname+"/access.php?action=getVMS&mission=" + comboBox2.Text).Result;
-            // deserialisiere die JSON-Daten
-            dynamic vms = JsonConvert.DeserializeObject(response);
-            // füge die Daten in listView1 ein
+            listView1.Items.Clear();
             foreach (var vm in vms)
             {
-                ListViewItem lvi = new ListViewItem(vm.hostname);
-                lvi.SubItems.Add(vm.ip);
-                lvi.SubItems.Add(vm.subnet);
-                lvi.SubItems.Add(vm.gateway);
-                lvi.SubItems.Add(vm.dns1);
-                lvi.SubItems.Add(vm.dns2);
-                lvi.SubItems.Add(vm.domain);
-                lvi.SubItems.Add(vm.vlan);
-                lvi.SubItems.Add(vm.tags);
+                Console.WriteLine("Funktion UpdateListView: " + vm.vm_name);    
+
+                ListViewItem lvi = new ListViewItem(new[] {
+                                vm.vm_name,
+                                vm.vm_hostname,
+                                vm.vm_ip,
+                                vm.vm_subnet,
+                                vm.vm_gateway,
+                                vm.vm_dns1,
+                                vm.vm_dns2,
+                                vm.vm_domain,
+                                vm.vm_vlan,
+                                vm.vm_os,
+                                vm.vm_packages,
+                                vm.vm_status
+                                    });
+
+                lvi.Tag = vm;
+
                 listView1.Items.Add(lvi);
+                listView1.Show(); 
             }
         }
 
-
-
-        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        public class ListBoxItem
         {
+            public string Name { get; set; }
+            public int Id { get; set; }
 
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label14_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            // füge txtHostname in ListView ein
-            ListViewItem lvi = new ListViewItem(txtHostname.Text);
-            lvi.SubItems.Add(txtIP.Text);
-            lvi.SubItems.Add(txtSubnet.Text);
-            lvi.SubItems.Add(txtGateway.Text);
-            lvi.SubItems.Add(txtDNS1.Text);
-            lvi.SubItems.Add(txtDNS2.Text);
-            lvi.SubItems.Add(txtDomain.Text);
-            lvi.SubItems.Add("unbekannt");
-            // füge VLAN hinzu
-            lvi.SubItems.Add(comboVLAN.Text);
-            // listBox1 (MultiSelect) mit Semikolon getrennt hinzufügen
-            string selectedItems = "";
-            foreach (var item in listBox1.SelectedItems)
+            // Konstruktor
+            public ListBoxItem(string name, int id)
             {
-                selectedItems += item.ToString() + ";";
+                Name = name;
+                Id = id;
             }
-            lvi.SubItems.Add(selectedItems);
 
-            LogForm logForm = new LogForm();
-            logForm.AddLog("Dies ist eine Log-Nachricht.");
-
-
-            listView1.Items.Add(lvi);
-            ClearTextBoxes();
-            DisableButtons();
-
-
+            // Die ToString()-Methode zurückgibt den Namen, der in der ListBox angezeigt wird
+            public override string ToString()
+            {
+                return Name;
+            }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public class OSItem
         {
-            // bearbeitet das ausgewählte Item in der ListView mit den werten aus den textfeldern
-            if (listView1.SelectedItems.Count > 0)
+            public string os_name { get; set; }
+            public int Id { get; set; }
+
+            public OSItem(string name, int id)
             {
-                ListViewItem lvi = listView1.SelectedItems[0];
-                lvi.Text = txtHostname.Text;
-                lvi.SubItems[1].Text = txtIP.Text;
-                lvi.SubItems[2].Text = txtSubnet.Text;
-                lvi.SubItems[3].Text = txtGateway.Text;
-                lvi.SubItems[4].Text = txtDNS1.Text;
-                lvi.SubItems[5].Text = txtDNS2.Text;
-                lvi.SubItems[6].Text = txtDomain.Text;
-                lvi.SubItems[7].Text = comboVLAN.Text;
-                // listBox1 (MultiSelect) mit Semikolon getrennt hinzufügen
-                string selectedItems = "";
-                foreach (var item in listBox1.SelectedItems)
+                os_name = name;
+                Id = id;
+            }
+
+            // Die ListBox verwendet ToString(), um den anzuzeigenden Text zu bestimmen.
+            public override string ToString()
+            {
+                return $"{os_name}"; // Format: "OS-Name (ID)"
+            }
+        }
+
+        public class MissionItem
+        {
+            public int Id { get; set; }
+            public string mission_name { get; set; }
+            public int vm_count { get; set; } // Angenommen, du möchtest auch die Anzahl der VMs speichern
+
+            // Konstruktor
+            public MissionItem(int id, string missionName, int vmCount)
+            {
+                Id = id;
+                mission_name = missionName;
+                vm_count = vmCount;
+            }
+
+            // Überschreibe ToString(), um den Text im ListBox anzuzeigen
+            public override string ToString()
+            {
+                return $"{mission_name} ({vm_count})";
+            }
+        }
+
+        public class PackageItem
+        {
+            public string package_name { get; set; }
+            public int Id { get; set; }
+
+            public PackageItem(string name, int id)
+            {
+                package_name = name;
+                Id = id;
+            }
+
+            // Die ListBox verwendet ToString(), um den anzuzeigenden Text zu bestimmen.
+            public override string ToString()
+            {
+                return $"{package_name}"; // Format: "OS-Name (ID)"
+            }
+        }
+
+        public class VLANItem
+        {
+            public string vlan_name { get; set; }
+            public int Id { get; set; }
+
+            public VLANItem(string name, int id)
+            {
+                vlan_name = name;
+                Id = id;
+            }
+
+            // Die ListBox verwendet ToString(), um den anzuzeigenden Text zu bestimmen.
+            public override string ToString()
+            {
+                return $"{vlan_name}"; // Format: "OS-Name (ID)"
+            }
+        }
+
+        private void btnVergleich_Click(object sender, EventArgs e)
+        {
+
+
+            // messagebox
+            MessageBox.Show("Vergleiche die VM-Objekte mit der Liste vms.");
+
+
+            // Vergleiche die VM-Objekte mit der Liste vms
+            foreach (VM vm in vms)
+            {
+                bool found = false;
+
+                // Überprüfe, ob das VM-Objekt in der Liste vms vorhanden ist
+                foreach (ListViewItem item in listView1.Items)
                 {
-                    selectedItems += item.ToString() + ";";
+                    if (vm.vm_name == item.SubItems[0].Text &&
+                        vm.vm_ip == item.SubItems[1].Text &&
+                        vm.vm_subnet == item.SubItems[2].Text &&
+                        vm.vm_gateway == item.SubItems[3].Text &&
+                        vm.vm_dns1 == item.SubItems[4].Text &&
+                        vm.vm_dns2 == item.SubItems[5].Text &&
+                        vm.vm_domain == item.SubItems[6].Text &&
+                        vm.vm_vlan == item.SubItems[7].Text &&
+                        vm.vm_os == item.SubItems[8].Text &&
+                        vm.vm_role == item.SubItems[9].Text &&
+                        vm.vm_status == item.SubItems[10].Text)
+                    {
+                        found = true;
+                        break;
+                    }
                 }
-                lvi.SubItems[8].Text = selectedItems;
-                ClearTextBoxes();
-                DisableButtons();
-            }
 
-        }
+                string vmname = vm.vm_name;
 
-
-        // bei doppelklick auf ein item in der listView1, werden die werte in die textfelder geschrieben
-        void listView1_DoubleClick(object sender, EventArgs e)
-        {
-            if (listView1.SelectedItems.Count > 0)
-            {
-                ListViewItem lvi = listView1.SelectedItems[0];
-                txtHostname.Text = lvi.Text;
-                txtIP.Text = lvi.SubItems[1].Text;
-                txtSubnet.Text = lvi.SubItems[2].Text;
-                txtGateway.Text = lvi.SubItems[3].Text;
-                txtDNS1.Text = lvi.SubItems[4].Text;
-                txtDNS2.Text = lvi.SubItems[5].Text;
-                txtDomain.Text = lvi.SubItems[6].Text;
-                comboVLAN.Text = lvi.SubItems[7].Text;
-                // listBox1 (MultiSelect) mit Semikolon getrennt hinzufügen
-                string[] selectedItems = lvi.SubItems[8].Text.Split(';');
-                foreach (var item in selectedItems)
+                // Wenn das VM-Objekt nicht in der Liste vms gefunden wurde, gib es in der Konsole aus
+                if (!found)
                 {
-                    listBox1.SelectedItems.Add(item);
+                    Console.WriteLine($"Das VM-Objekt mit den Eigenschaften: {vm.vm_name}, {vm.vm_ip}, {vm.vm_subnet}, {vm.vm_gateway}, {vm.vm_dns1}, {vm.vm_dns2}, {vm.vm_domain}, {vm.vm_vlan}, {vm.vm_os}, {vm.vm_role}, {vm.vm_status} fehlt in der Liste listView1.");
                 }
-
-                EnableButtons();
+                else { Console.WriteLine(vm.vm_name+" passt."); }
             }
         }
 
-
-        private void button7_Click(object sender, EventArgs e)
+        private void MissionChange(object sender, EventArgs e)
         {
-            // lösche das ausgewählte Item aus der ListView und macht die Textboxen leer
-            if (listView1.SelectedItems.Count > 0)
+            var aktuelleAuswahl = missionBox.Text;
+
+            if (aktuelleAuswahl == "")
             {
-                listView1.Items.Remove(listView1.SelectedItems[0]);
-                ClearTextBoxes();
-                DisableButtons();
+                btn_loadVMsfromDB(sender, e);
+            }
+            else
+            {
+                DialogResult result = MessageBox.Show("Möchten Sie die Mission wechseln?", "Bestätigung", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    btn_loadVMsfromDB(sender, e);
+                }
+                else
+                {
+                    selectMission(missionName + " (" + vms.Count + ")");
+                }
             }
         }
 
-        private void btnClear_Click(object sender, EventArgs e)
+        private void btnDeploy(object sender, EventArgs e)
         {
-            ClearTextBoxes();
-            DisableButtons();
 
         }
 
-        private void button1_Click_1(object sender, EventArgs e)
+        private void btn_hypervisorconnectioncheck(object sender, EventArgs e)
         {
-            // exportiere die ListView in eine CSV-Datei
-            ExportToCSV();
-        }
-
-        private void button4_Click_1(object sender, EventArgs e)
-        {
-            // importiere eine CSV-Datei in die ListView
-            ImportFromCSV();
-        }
-
-        private void button7_Click_1(object sender, EventArgs e)
-        {
-            // öffne das LogForm und füge eine Log-Nachricht hinzu (dies ist nur ein Beispiel) 
-            LogForm logForm = new LogForm();
-            logForm.AddLog("Dies ist eine Log-Nachricht.");
-            logForm.ShowDialog();
-
 
         }
     }

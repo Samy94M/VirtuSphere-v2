@@ -6,8 +6,9 @@ require_once 'function.php';
 $token = isset($_GET['token']) ? htmlspecialchars($_GET['token']) : '';
 
 if (!verifyToken($token, $connection)) {
-    header('HTTP/1.1 403 Forbidden');
-    echo 'Access Forbidden';
+    // http code 418
+    header('HTTP/1.1 418 I\'m a teapot');
+    echo json_encode('Access Forbidden');
     exit;
 }
 
@@ -41,8 +42,9 @@ if (isset($_GET['action']) && $_GET['action'] == 'getMissions') {
 
 
 # Schreibe eine getVM Funktion die alle VMs aus der Datenbank holt und als Json ausgibt
-if (isset($_GET['action']) && $_GET['action'] == 'getVMs') {
-    $result = getVMs($connection);
+if (isset($_GET['action']) && isset($_GET["missionId"]) && $_GET['action'] == 'getVMs') {
+    $missionId = $_GET["missionId"];
+    $result = getVMs($connection, $missionId);
     echo json_encode($result);
 }
 
@@ -52,4 +54,155 @@ if (isset($_GET['action']) && $_GET['action'] == 'getPackages') {
     $result = getPackages($connection);
     echo json_encode($result);
 }
+
+
+## Schreibe hier die passende function für DeleteMission
+if (isset($_GET['action']) && $_GET['action'] == 'deleteMission') {
+    $missionId = isset($_GET['missionId']) ? htmlspecialchars($_GET['missionId']) : '';
+    $result = deleteMission($missionId, $connection);
+    if( $result){
+        header('HTTP/1.1 200 OK');
+        echo json_encode($result);
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode($result);
+    
+    }
+}
+
+
+## Schreib hier eine passende function für createMission
+if (isset($_GET['action']) && $_GET['action'] == 'createMission') {
+    $missionName = isset($_GET['missionName']) ? htmlspecialchars($_GET['missionName']) : '';
+    $result = createMission($missionName, $connection);
+    if( $result){
+        header('HTTP/1.1 200 OK');
+        echo json_encode($result);
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode($result);
+    
+    }
+}
+
+## schreibe hier eine passende function für getOS
+if (isset($_GET['action']) && $_GET['action'] == 'getOS') {
+    $result = getOS($connection);
+    echo json_encode($result);
+}
+
+## Schreibe hier eine Funktion die eine JSON 
+#public async Task<bool> SendVMList(string hostname, string token, int missionId, List<VM> vmList)
+#{
+#    if (vmList != null)
+#    {
+#        Console.WriteLine("SendVMList called: MissionId: " + missionId);
+#        Console.WriteLine("SendVMList called: Token: " + token);
+#        Console.WriteLine("SendVMList called: Hostname: " + hostname);#
+
+#        string requestUri = $"http://{hostname}/access.php?action=sendVMList&token={token}&missionId={missionId}";
+
+ #       var json = JsonConvert.SerializeObject(vmList);
+#        var content = new StringContent(json, Encoding.UTF8, "application/json");
+#        var response = await _httpClient.PostAsync(requestUri, content);
+
+
+# schreibe import json vmlist function
+if (isset($_GET['action']) && $_GET['action'] == 'sendVMList') {
+
+$missionId = isset($_GET['missionId']) ? htmlspecialchars($_GET['missionId']) : '';
+
+// JSON-Daten aus dem Request Body holen
+$json = file_get_contents('php://input');
+$vmList = json_decode($json);
+
+if (!empty($vmList)) {
+        // Leere deploy_vms mit der mission_id
+        #$query = "DELETE FROM deploy_vms WHERE mission_id = '{$missionId}'";
+        #$result = $connection->query($query);
+
+
+    foreach ($vmList as $vm) {
+        $query = "INSERT INTO deploy_vms (mission_id, vm_name, vm_hostname, vm_ip, vm_subnet, vm_gateway, vm_dns1, vm_dns2, vm_domain, vm_vlan, vm_role, vm_status, os_id) VALUES ('{$missionId}', '{$vm->vm_name}', '{$vm->vm_hostname}', '{$vm->vm_ip}', '{$vm->vm_subnet}', '{$vm->vm_gateway}', '{$vm->vm_dns1}', '{$vm->vm_dns2}', '{$vm->vm_domain}', '{$vm->vm_vlan}', '{$vm->vm_role}', '{$vm->vm_status}', '{$vm->os_id}')";
+
+        // Führe die Anfrage aus
+        $result = $connection->query($query);
+
+        if (!$result) {
+            echo "Fehler: " . $connection->error;
+        }
+    }
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Keine Daten empfangen.']);
+}
+
+// gib $vmList aus
+echo json_encode($vmList);
+
+}
+
+## get vlan
+if (isset($_GET['action']) && $_GET['action'] == 'getVLANs') {
+    $result = getVLAN($connection);
+    echo json_encode($result);
+}
+
+
+## deleteVM with json data
+if (isset($_GET['action']) && $_GET['action'] == 'deleteVM') {
+    $json = file_get_contents('php://input');
+    $vmList = json_decode($json);
+    $result = deleteVM($vmList, $connection);
+    echo json_encode($result);
+}
+
+
+## vmListToCreate
+if (isset($_GET['action']) && $_GET['action'] == 'vmListToCreate') {
+    $json = file_get_contents('php://input');
+    $vmList = json_decode($json);
+    $mssionId = isset($_GET['missionId']) ? htmlspecialchars($_GET['missionId']) : '';
+    $result = vmListToCreate($mssionId, $vmList, $connection);
+    if($result > 0){
+        header('HTTP/1.1 200 OK');
+        // json: success true
+        echo json_encode(['success' => true, 'action' => $_GET['action'], 'VMS' => $result]);
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['success' => false, 'action' => $_GET['action'], 'VMS' => $result]);
+    }
+}
+
+## vmListToUpdate
+if (isset($_GET['action']) && $_GET['action'] == 'vmListToUpdate') {
+    $json = file_get_contents('php://input');
+    $vmList = json_decode($json);
+    $result = vmListToUpdate($vmList, $connection);
+    if($result > 0){
+        header('HTTP/1.1 200 OK');
+        // json: success true
+        echo json_encode(['success' => true, 'action' => $_GET['action'], 'VMS' => $result]);
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['success' => false, 'action' => $_GET['action'], 'VMS' => $result]);
+    }
+}
+
+## vmListToDelete
+if (isset($_GET['action']) && $_GET['action'] == 'vmListToDelete') {
+    $json = file_get_contents('php://input');
+    $vmList = json_decode($json);
+    $result = vmListToDelete($vmList, $connection);
+    if($result > 0){
+        header('HTTP/1.1 200 OK');
+        // json: success true
+        echo json_encode(['success' => true, 'action' => $_GET['action'], 'VMS' => $result]);
+    } else {
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(['success' => false, 'action' => $_GET['action'], 'VMS' => $result]);
+    }
+}
+
+
 ?>

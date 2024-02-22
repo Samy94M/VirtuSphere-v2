@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 
 
 namespace VirtuSphere
@@ -22,9 +23,15 @@ namespace VirtuSphere
         {
             InitializeComponent();
 
-            comboBox1.Items.Add("Item 1");
-            comboBox1.Items.Add("Item 2");
-            comboBox1.Items.Add("Item 3");
+            // ließ serverlist.ini, wenn vorhanden, ansonsten füge localhost:8021 ein und füge die Servernamen in die ComboBox ein
+            string[] serverList = new string[] { "localhost:8021" };
+            if (System.IO.File.Exists("serverlist.ini"))
+            {
+                serverList = System.IO.File.ReadAllLines("serverlist.ini");
+            }
+            comboBox1.Items.AddRange(serverList);
+
+
 
             comboBox1.SelectedIndex = 0;
         }
@@ -32,12 +39,19 @@ namespace VirtuSphere
 
         private async void btnLogin_Click(object sender, EventArgs e)
         {
-            string username = txtLoginname.Text;
+            string username = txtUsername.Text; // Stelle sicher, dass die Feldnamen korrekt sind
             string password = txtPassword.Text;
             string hostname = comboBox1.SelectedItem.ToString();
 
-            if (await IsValidLogin(username, password, hostname))
+            // ApiService-Instanz sollte bereits verfügbar sein, z.B. über Dependency Injection
+            ApiService apiService = new ApiService(); // Erstellen Sie eine Instanz der ApiService-Klasse
+            string token = await apiService.IsValidLogin(username, password, hostname);
+
+
+            if (!string.IsNullOrEmpty(token))
             {
+                this.Token = token; // Speichere den Token
+                this.hostname = hostname; // Speichere den Hostnamen
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -48,37 +62,7 @@ namespace VirtuSphere
             }
         }
 
-        private async Task<bool> IsValidLogin(string username, string password, string hostname)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                var parameters = new Dictionary<string, string>
-                    {
-                        { "action", "login" },
-                        { "username", username },
-                        { "password", password }
-                    };
-
-                var content = new FormUrlEncodedContent(parameters);
-                var response = await client.PostAsync("http://"+hostname+"/login.php", content);
-                var result = await response.Content.ReadAsStringAsync();
-                this.hostname = hostname;
-
-                // wenn nicht "Invalid login credentials" dann speicher die rückgabe in einer variable token
-                // und gib true zurück
-                if (!result.Contains("Invalid login credentials"))
-                {
-                    // Token soll an Program.cs übergeben 
-                    Token = result;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
 
 
-            }
-        }
     }
 }
