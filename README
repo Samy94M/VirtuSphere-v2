@@ -1,0 +1,34 @@
+##VirtuSphere
+Dieses Projekt ist eine C#-Anwendung, die es ermöglicht, virtuelle Maschinen (VMs) zu verwalten. Die Anwendung verbindet sich über eine PHP-API mit einer MySQL-Datenbank, um VM-Konfigurationen zu speichern und zu verwalten. VMs werden auf einem ESXi-Server über einen Ansible-Server bereitgestellt, wobei die PHP-API, MySQL und phpMyAdmin in Docker-Containern gehostet werden.
+
+Hauptmerkmale
+VM-Management: Benutzerfreundliche GUI zur Verwaltung von VM-Konfigurationen.
+Datenbank-Integration: Nutzt eine MySQL-Datenbank für die Speicherung der VM-Konfigurationen, zugänglich über eine PHP-API.
+Deployment: Automatisiertes Deployment von VMs auf einem ESXi-Server mittels Ansible Playbooks.
+Netzwerk-Konfiguration: Automatisches Auslesen und Speichern der MAC-Adressen neu erstellter VMs zur Integration mit MECM für PXE-Boot-Installationen.
+MECM-Integration: Konfiguration von Windows-Images und Paketen für VMs über MECM, gesteuert durch Daten aus der MySQL-Datenbank.
+Architektur
+Das System besteht aus mehreren Komponenten, die zusammenarbeiten, um eine nahtlose VM-Bereitstellung und -Verwaltung zu ermöglichen:
+
+Frontend: C#-basierte GUI für das Management von VMs.
+Backend: PHP-API zur Kommunikation mit der MySQL-Datenbank.
+Datenbank: Gehostet in einem Docker-Container, inklusive phpMyAdmin für die Datenbankverwaltung.
+Deployment: Ansible-Server zur Automatisierung des VM-Deployments auf ESXi.
+Netzwerk- und Systemintegration: Nutzung der MAC-Adressen für die PXE-Boot-Installation über MECM.
+Erste Schritte
+Voraussetzungen
+Docker und Docker Compose
+Ansible
+ESXi-Server
+MECM-Server
+Setup
+Docker-Container starten: Führe docker-compose up aus, um die PHP-API, MySQL und phpMyAdmin zu starten.
+Datenbank initialisieren: Rufe initial.php auf, um die SQL-Struktur und Testdaten zu erstellen.
+C#-Anwendung starten: Öffne die Anwendung und konfiguriere die Verbindungseinstellungen zur PHP-API.
+Ansible Playbooks konfigurieren: Stelle sicher, dass die Playbooks korrekt auf deinen ESXi-Server und die VM-Konfigurationen ausgerichtet sind.
+MECM-Integration einrichten: Konfiguriere das regelmäßige Ausführen des PowerShell-Skripts, um VM-Installationsdaten von der MySQL-Datenbank zu MECM zu übertragen.
+Beitrag
+Wir begrüßen Beiträge zu diesem Projekt. Bitte lese CONTRIBUTING.md für Details über unseren Code of Conduct und den Prozess für das Einreichen von Pull Requests.
+
+Lizenz
+Dieses Projekt ist unter der MIT-Lizenz lizenziert 
