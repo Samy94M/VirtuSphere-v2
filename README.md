@@ -1,5 +1,13 @@
 # VirtuSphere 
 
+## ToDos
+ - Generieren der Ansible-Playbooks
+ - Transfer der Ansible-Playbooks
+ - Trigger der Ansible-Playbooks (Ausgabe in Echtzeit)
+ - MECM Powershell Skripte für 
+    - Import new Device <MySQL -> WebAPI -> MECM>
+    - Export der Task Sequenzen für Betriebssysteme und export der Packages im Ordner Autodeployment <MECM -> WebAPI -> MySQL>
+
 Dieses Projekt ist eine fortschrittliche C#-Anwendung, die für das Management von virtuellen Maschinen (VMs) konzipiert ist. Es ermöglicht Benutzern, sich über eine PHP-API mit einer MySQL-Datenbank zu verbinden, um VM-Konfigurationen zu speichern und zu verwalten. Die Anwendung generiert dynamisch Ansible Playbooks, die verwendet werden, um VMs auf einem ESXi-Server zu deployen. Sowohl die Web-API als auch die MySQL-Datenbank und phpMyAdmin sind in Docker-Containern untergebracht, was eine einfache Installation und Wartung ermöglicht.
 
 ![GUI](Screenshots/Oberfläche2.jpg "GUI")
