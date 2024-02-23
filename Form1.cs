@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -45,6 +46,8 @@ namespace VirtuSphere
             DisableInputFields();
 
         }
+
+
         public async void btn_loadVMsfromDB(object sender, EventArgs e)
         {
             if(missionBox.SelectedIndex != -1)
@@ -919,12 +922,164 @@ namespace VirtuSphere
             }
         }
 
-        private void btnDeploy(object sender, EventArgs e)
+        private async void btnDeploy(object sender, EventArgs e)
         {
+            var sshConnector = new SshConnector();
+
+
+
+
+            // suche private Key im Windows User profile
+            string privateKeyPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.ssh\\id_rsa";
+            string publicKeyPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.ssh\\id_rsa.pub";
+            string publicKey = "";
+            string checkAndAddPublicKeyCommand = "";
+
+            string ssh_password = txt_ssh_password.Text;
+            string ssh_ip = txt_ssh_ip.Text;
+            string ssh_port = txt_ssh_port.Text;
+            string ssh_user = txt_ssh_user.Text;
+
+
+
+            if (!int.TryParse(ssh_port, out int sshport))
+            {
+                MessageBox.Show("SSH-Port ist ungültig.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // prüfe ob datei existiert
+            if (System.IO.File.Exists(privateKeyPath))
+            {
+                Console.WriteLine("Private Key gefunden: " + privateKeyPath);
+
+                publicKey = File.ReadAllText(publicKeyPath);
+                publicKey = publicKey.Replace("\n", "").Replace("\r", ""); // Entferne mögliche Newline-Zeichen
+                Console.WriteLine("Öffentlicher Schlüssel aus Datei: " + publicKey);
+            }
+            else
+            {
+                Console.WriteLine("Private Key nicht gefunden: " + privateKeyPath);
+
+                if (checkSSHKey.Checked)
+                {
+                    // ssh key erzeugen
+                    publicKey = sshConnector.GenerateSSHKey(privateKeyPath);
+
+                    if (!string.IsNullOrEmpty(publicKey))
+                    {
+                        Console.WriteLine("Öffentlicher Schlüssel generiert: ");
+                        Console.WriteLine(publicKey);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Fehler beim Generieren des SSH-Schlüssels.");
+
+                        MessageBox.Show("Fehler beim Generieren des SSH-Schlüssels. Bitte prüfen Sie die Konsole.");
+                        // abbruch
+                        return;
+                    }
+
+                }
+               
+
+                if(useSSHKey.Checked)
+                {
+
+                    // Erstellt einen Befehl, der prüft, ob der öffentliche Schlüssel bereits in authorized_keys vorhanden ist, und fügt ihn hinzu, falls nicht
+                    checkAndAddPublicKeyCommand = $"grep -q -F '{publicKey}' ~/.ssh/authorized_keys || echo '{publicKey}' >> ~/.ssh/authorized_keys";
+
+                    // Füge den geänderten Befehl zur Liste der Befehle hinzu
+                    //commands.Add(checkAndAddPublicKeyCommand);
+
+                    MessageBox.Show("Verwende Key Authentifizierung");
+
+                }
+            }
+
+            List<string> commands = new List<string>
+            {
+                $"grep -q -F '{publicKey}' ~/.ssh/authorized_keys || echo '{publicKey}' >> ~/.ssh/authorized_keys"
+            };
+
+            // führe folgende Befehle remote aus in console
+            foreach (var command in commands)
+            {
+                Console.WriteLine("Befehl für remote: " + command);
+            }
+
+            // Angenommen, ExecuteCommands ist nun asynchron und du hast den Code entsprechend angepasst.
+            commands.Add("ls -la");
+
+
+
+            List<string> deployItems = new List<string>();
+
+            if (ssh_password != "")
+            {
+                deployItems = sshConnector.ExecuteCommands(ssh_ip, sshport, ssh_user, ssh_password, commands);
+                Console.WriteLine("Authentification with password");
+            }
+            else
+            {
+                deployItems = sshConnector.ExecuteCommands(ssh_ip, sshport, ssh_user, privateKeyPath, commands);
+                Console.WriteLine("Authentification with private key");
+            }
+            
+
+            // Erstelle eine Instanz von DeployForm
+            DeployForm deployForm = new DeployForm();
+
+            // Füge die Ausgaben zur DeployListView in DeployForm hinzu
+            deployForm.AddDeployItems(deployItems);
+
+            // Zeige DeployForm an
+            deployForm.Show();
 
         }
 
-        private void btn_hypervisorconnectioncheck(object sender, EventArgs e)
+        private async void btn_connectionHypervisor(object sender, EventArgs e)
+        {
+            Console.WriteLine("Auswahl: " + comboHypervisor.SelectedText);
+
+            if (comboHypervisor.SelectedText != "Hyper-V")
+            {
+                button6.Text = "Verbinden";
+                lbl_hypervisor.Text = "Status: Verbinde...";
+                button6.Enabled = false;
+
+                Console.WriteLine("Verbinde mit ESXi");
+                string esxiHost = txt_hv_ip.Text;
+                string username = txt_hv_loginname.Text;
+                string password = txt_hv_loginpassword.Text;
+
+                bool credentialsValid = await EsxiApiHelper.VerifyEsxiCredentialsAsync(esxiHost, username, password);
+                if (credentialsValid)
+                {
+                    Console.WriteLine("Zugangsdaten sind korrekt.");
+                    lbl_hypervisor.Text = "Status: Verbindung war erfolgreich!";
+                    button6.Text = "Verbinden";
+
+                }
+                else
+                {
+                    Console.WriteLine("Zugangsdaten sind ungültig oder es gab einen Fehler.");
+                    lbl_hypervisor.Text = "Status: Zugangsdaten sind ungültig oder es gab einen Fehler.";
+                    button6.Text = "Verbinden";
+                    button6.Enabled = true;
+                }
+
+
+            }
+            else
+            {
+                MessageBox.Show("Hyper-V wird aktuell noch nicht unterstützt.");
+            }
+
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
         {
 
         }

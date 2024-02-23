@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static VirtuSphere.FMmain;
-using VMware.Vim;
 
 namespace VirtuSphere
 {
@@ -506,30 +505,7 @@ namespace VirtuSphere
 
             
         }
-        public bool ConnectToEsxi(string hostname, string username, string password)
-        {
-            VimClient client = new VimClient();
-            try
-            {
-                ServiceContent sc = client.Connect(hostname);
-                UserSession us = client.Login(username, password);
-                // Hier könntest du Aktionen durchführen, z.B. VMs auflisten
-                Console.WriteLine("Verbunden mit ESXi/vCenter");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler beim Verbinden: {ex.Message}");
-                return false;
-            }
-            finally
-            {
-                if (client != null)
-                {
-                    client.Disconnect();
-                }
-            }
-        }
+
 
         public class VLAN
         {

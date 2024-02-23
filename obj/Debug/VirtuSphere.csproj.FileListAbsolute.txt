@@ -13,3 +13,17 @@ C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.LogFor
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Newtonsoft.Json.dll
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Newtonsoft.Json.xml
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSph.31DFAD95.Up2Date
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.ServiceModel.Duplex.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.ServiceModel.Http.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.ServiceModel.NetTcp.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.ServiceModel.Primitives.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.ServiceModel.Security.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Renci.SshNet.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Renci.SshNet.xml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.DeployForm.resources

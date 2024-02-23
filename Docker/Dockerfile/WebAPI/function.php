@@ -283,7 +283,7 @@ function vmListToCreate($missionId, $vmList, $connection){
    if (!empty($vmList)) {
       $successCount = 0;
       foreach ($vmList as $vm) {
-         $query = "INSERT INTO deploy_vms (mission_id, vm_name, vm_hostname, vm_ip, vm_subnet, vm_gateway, vm_dns1, vm_dns2, vm_domain, vm_vlan, vm_role, vm_status, os_id, vm_packages) VALUES ('{$missionId}','{$vm->vm_name}', '{$vm->vm_hostname}', '{$vm->vm_ip}', '{$vm->vm_subnet}', '{$vm->vm_gateway}', '{$vm->vm_dns1}', '{$vm->vm_dns2}', '{$vm->vm_domain}', '{$vm->vm_vlan}', 'aktiv', '', '{$vm->os_id}', '{$vm->vm_packages}')";
+         $query = "INSERT INTO deploy_vms (mission_id, vm_name, vm_hostname, vm_ip, vm_subnet, vm_gateway, vm_dns1, vm_dns2, vm_domain, vm_vlan, vm_role, vm_status, os_id, vm_os, vm_packages) VALUES ('{$missionId}','{$vm->vm_name}', '{$vm->vm_hostname}', '{$vm->vm_ip}', '{$vm->vm_subnet}', '{$vm->vm_gateway}', '{$vm->vm_dns1}', '{$vm->vm_dns2}', '{$vm->vm_domain}', '{$vm->vm_vlan}', 'aktiv', '', '{$vm->os_id}', '{$vm->vm_os}', '{$vm->vm_packages}')";
          $result = $connection->query($query);
          if ($result) {
             $successCount++;
@@ -310,7 +310,7 @@ function vmListToUpdate($vmList, $connection){
                $status = $vm->vm_status;
             }
 
-            $query = "UPDATE deploy_vms SET vm_name = '{$vm->vm_name}', vm_ip = '{$vm->vm_ip}', vm_subnet = '{$vm->vm_subnet}', vm_gateway = '{$vm->vm_gateway}', vm_dns1 = '{$vm->vm_dns1}', vm_dns2 = '{$vm->vm_dns2}', vm_domain = '{$vm->vm_domain}', vm_vlan = '{$vm->vm_vlan}', vm_role = '{$vm->vm_role}', vm_status = '$status', os_id = '{$vm->os_id}', vm_packages = '{$vm->vm_packages}', updated_at = NOW() WHERE id = '{$vm->Id}'";
+            $query = "UPDATE deploy_vms SET vm_name = '{$vm->vm_name}', vm_ip = '{$vm->vm_ip}', vm_subnet = '{$vm->vm_subnet}', vm_gateway = '{$vm->vm_gateway}', vm_dns1 = '{$vm->vm_dns1}', vm_dns2 = '{$vm->vm_dns2}', vm_domain = '{$vm->vm_domain}', vm_vlan = '{$vm->vm_vlan}', vm_role = '{$vm->vm_role}', vm_status = '$status', os_id = '{$vm->os_id}', vm_os = '{$vm->vm_os}', vm_packages = '{$vm->vm_packages}', updated_at = NOW() WHERE id = '{$vm->Id}'";
             $result = $connection->query($query);
             if (!$result) {
                die('Error: ' . $connection->error);
