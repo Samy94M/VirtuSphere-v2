@@ -11,7 +11,7 @@ Dieses Projekt ist eine fortschrittliche C#-Anwendung, die für das Management v
  - MECM Powershell Skripte für 
     - Import new Device <MySQL -> WebAPI -> MECM>
     - Export der Task Sequenzen für Betriebssysteme und export der Packages im Ordner Autodeployment <MECM -> WebAPI -> MySQL>
- - Hyper-V unterstützung 
+ - Hyper-V Unterstützung 
 
 ## Hauptmerkmale
 
