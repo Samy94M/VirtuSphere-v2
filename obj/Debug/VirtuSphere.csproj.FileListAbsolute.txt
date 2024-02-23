@@ -27,3 +27,7 @@ C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Renci.SshNet.xml
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.DeployForm.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.exe.manifest
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.application
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.exe.manifest
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.application
