@@ -45,6 +45,11 @@ namespace VirtuSphere
 
             DisableInputFields();
 
+            string LocalUserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string LocalAnsiblePath = LocalUserProfile + "\\ansible-playbooks";
+            txtAnsibleLocal.Text = LocalAnsiblePath;
+            comboAnsibleRemote.SelectedIndex = 0;
+
         }
 
 

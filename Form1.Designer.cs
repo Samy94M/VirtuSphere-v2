@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
             this.button8 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
@@ -54,7 +55,13 @@
             this.Packages = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Umgebung = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.comboAnsibleRemote = new System.Windows.Forms.ComboBox();
+            this.txtAnsibleLocal = new System.Windows.Forms.TextBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button2 = new System.Windows.Forms.Button();
             this.label19 = new System.Windows.Forms.Label();
             this.txt_ssh_port = new System.Windows.Forms.TextBox();
             this.useSSHKey = new System.Windows.Forms.CheckBox();
@@ -67,6 +74,7 @@
             this.txt_ssh_user = new System.Windows.Forms.TextBox();
             this.txt_ssh_ip = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label16 = new System.Windows.Forms.Label();
             this.comboHypervisor = new System.Windows.Forms.ComboBox();
             this.lbl_hypervisor = new System.Windows.Forms.Label();
@@ -105,25 +113,19 @@
             this.txtSubnet = new System.Windows.Forms.TextBox();
             this.txtIP = new System.Windows.Forms.TextBox();
             this.txtHostname = new System.Windows.Forms.TextBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label24 = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.Liste.SuspendLayout();
             this.Umgebung.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.button5);
             this.groupBox1.Controls.Add(this.label9);
             this.groupBox1.Controls.Add(this.button8);
             this.groupBox1.Controls.Add(this.button4);
@@ -142,6 +144,15 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Tabelle";
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(910, 688);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(108, 43);
+            this.button5.TabIndex = 23;
+            this.button5.Text = "Erstelle Playbooks";
+            this.button5.UseVisualStyleBackColor = true;
             // 
             // label9
             // 
@@ -352,6 +363,55 @@
             this.Umgebung.TabIndex = 1;
             this.Umgebung.Text = "Umgebung";
             // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.comboAnsibleRemote);
+            this.groupBox5.Controls.Add(this.txtAnsibleLocal);
+            this.groupBox5.Controls.Add(this.label25);
+            this.groupBox5.Controls.Add(this.label24);
+            this.groupBox5.Location = new System.Drawing.Point(18, 232);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(428, 107);
+            this.groupBox5.TabIndex = 15;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Ansible";
+            // 
+            // comboAnsibleRemote
+            // 
+            this.comboAnsibleRemote.FormattingEnabled = true;
+            this.comboAnsibleRemote.Items.AddRange(new object[] {
+            "/tmp",
+            "/home"});
+            this.comboAnsibleRemote.Location = new System.Drawing.Point(197, 64);
+            this.comboAnsibleRemote.Name = "comboAnsibleRemote";
+            this.comboAnsibleRemote.Size = new System.Drawing.Size(215, 21);
+            this.comboAnsibleRemote.TabIndex = 14;
+            // 
+            // txtAnsibleLocal
+            // 
+            this.txtAnsibleLocal.Location = new System.Drawing.Point(197, 38);
+            this.txtAnsibleLocal.Name = "txtAnsibleLocal";
+            this.txtAnsibleLocal.Size = new System.Drawing.Size(215, 20);
+            this.txtAnsibleLocal.TabIndex = 14;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(57, 67);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(94, 13);
+            this.label25.TabIndex = 15;
+            this.label25.Text = "Playbooks remote:";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(67, 41);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(84, 13);
+            this.label24.TabIndex = 14;
+            this.label24.Text = "Playbooks lokal:";
+            // 
             // groupBox4
             // 
             this.groupBox4.Controls.Add(this.button2);
@@ -372,6 +432,15 @@
             this.groupBox4.TabIndex = 14;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Ansible Server";
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(405, 160);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(121, 23);
+            this.button2.TabIndex = 16;
+            this.button2.Text = "Verbindungscheck";
+            this.button2.UseVisualStyleBackColor = true;
             // 
             // label19
             // 
@@ -488,6 +557,16 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Hypervisor";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(197, 136);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(164, 17);
+            this.checkBox1.TabIndex = 14;
+            this.checkBox1.Text = "Verbindungscheck ignorieren";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // label16
             // 
             this.label16.AutoSize = true;
@@ -578,7 +657,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(910, 688);
+            this.button3.Location = new System.Drawing.Point(1023, 687);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(108, 43);
             this.button3.TabIndex = 5;
@@ -849,74 +928,6 @@
             this.txtHostname.Size = new System.Drawing.Size(215, 20);
             this.txtHostname.TabIndex = 1;
             // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.comboBox1);
-            this.groupBox5.Controls.Add(this.textBox1);
-            this.groupBox5.Controls.Add(this.label25);
-            this.groupBox5.Controls.Add(this.label24);
-            this.groupBox5.Location = new System.Drawing.Point(18, 232);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(428, 107);
-            this.groupBox5.TabIndex = 15;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Ansible";
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(67, 41);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(84, 13);
-            this.label24.TabIndex = 14;
-            this.label24.Text = "Playbooks lokal:";
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(57, 67);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(94, 13);
-            this.label25.TabIndex = 15;
-            this.label25.Text = "Playbooks remote:";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(405, 160);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(121, 23);
-            this.button2.TabIndex = 16;
-            this.button2.Text = "Verbindungscheck";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(197, 38);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(215, 20);
-            this.textBox1.TabIndex = 14;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "temp",
-            "home"});
-            this.comboBox1.Location = new System.Drawing.Point(197, 64);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(215, 21);
-            this.comboBox1.TabIndex = 14;
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(197, 136);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(164, 17);
-            this.checkBox1.TabIndex = 14;
-            this.checkBox1.Text = "Verbindungscheck ignorieren";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // FMmain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -931,14 +942,14 @@
             this.tabControl2.ResumeLayout(false);
             this.Liste.ResumeLayout(false);
             this.Umgebung.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1023,12 +1034,13 @@
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TextBox txt_ssh_port;
         private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtAnsibleLocal;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox comboAnsibleRemote;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button button5;
     }
 }
 
