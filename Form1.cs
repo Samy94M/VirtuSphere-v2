@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using static VirtuSphere.ApiService;
+using System.Security.Cryptography;
+
 
 
 namespace VirtuSphere
@@ -51,60 +45,70 @@ namespace VirtuSphere
             txtAnsibleLocal.Text = LocalAnsiblePath;
             comboAnsibleRemote.SelectedIndex = 0;
 
+            // befülle mit Properties.Settings, sofern vorhanden
+            if(Properties.Settings.Default.txt_ssh_ip != "") { txt_ssh_ip.Text = Properties.Settings.Default.txt_ssh_ip; }
+            if (Properties.Settings.Default.txt_ssh_port != "") { txt_ssh_port.Text = Properties.Settings.Default.txt_ssh_port; }
+            if (Properties.Settings.Default.txt_ssh_user != "") { txt_ssh_user.Text = Properties.Settings.Default.txt_ssh_user; }
+            if (Properties.Settings.Default.txt_ssh_password != "") { txt_ssh_password.Text = Properties.Settings.Default.txt_ssh_password; }
+            if (Properties.Settings.Default.txt_hv_ip != "") { txt_hv_ip.Text = Properties.Settings.Default.txt_hv_ip; }
+            if (Properties.Settings.Default.txt_hv_loginname != "") { txt_hv_loginname.Text = Properties.Settings.Default.txt_hv_loginname; }
+            if (Properties.Settings.Default.txt_hv_loginpassword != "") { txt_hv_loginpassword.Text = Properties.Settings.Default.txt_hv_loginpassword; }
+            if (Properties.Settings.Default.comboHypervisor != "") { comboHypervisor.Text = Properties.Settings.Default.comboHypervisor; }
 
-
+            if (Properties.Settings.Default.chk_ansible_credssave) { chk_ansible_credssave.Checked = true; } else { chk_ansible_credssave.Checked = false; }
+            if (Properties.Settings.Default.chk_hypervisor_credssave) { chk_hypervisor_credssave.Checked = true; } else { chk_hypervisor_credssave.Checked = false; }
         }
 
 
         public async void btn_loadVMsfromDB(object sender, EventArgs e)
         {
-            if(missionBox.SelectedIndex != -1)
+            if (missionBox.SelectedIndex != -1)
             {
                 MissionItem selectedItem = missionBox.SelectedItem as MissionItem;
                 if (selectedItem != null)
                 {
                     //MessageBox.Show($"Die ID der ausgewählten Mission ist: {selectedItem.Id}");
 
-                   // DialogResult result = MessageBox.Show("Möchten Sie die Liste der VMs aus der Datenbank laden?", "Bestätigung", MessageBoxButtons.YesNo);
+                    // DialogResult result = MessageBox.Show("Möchten Sie die Liste der VMs aus der Datenbank laden?", "Bestätigung", MessageBoxButtons.YesNo);
 
-                  //  if (result == DialogResult.Yes)
-                   // {
-                        // leere listView1 und fülle sie mit den VMs aus der Datenbank
-                        listView1.Items.Clear();
-                        ClearTextBoxes();
+                    //  if (result == DialogResult.Yes)
+                    // {
+                    // leere listView1 und fülle sie mit den VMs aus der Datenbank
+                    listView1.Items.Clear();
+                    ClearTextBoxes();
 
-                        missionId = selectedItem.Id;
-                        missionName = selectedItem.mission_name;
+                    missionId = selectedItem.Id;
+                    missionName = selectedItem.mission_name;
 
-                        // enable btn_add
-                        if (missionId != 0) { btn_add.Enabled = true; EnableInputFields(); }
+                    // enable btn_add
+                    if (missionId != 0) { btn_add.Enabled = true; EnableInputFields(); }
 
-                       // MessageBox.Show("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
-                        Console.WriteLine("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
+                    // MessageBox.Show("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
+                    Console.WriteLine("Lade VMs aus der Datenbank für die Mission " + selectedItem.mission_name + " mit der ID " + missionId);
 
-                        // leere vms 
-                        vms.Clear();
-                        vms = await ApiService.GetVMs(hostname, Token, missionId);
+                    // leere vms 
+                    vms.Clear();
+                    vms = await ApiService.GetVMs(hostname, Token, missionId);
 
-                        if (vms != null && vms.Count > 0)
+                    if (vms != null && vms.Count > 0)
+                    {
+                        UpdateListView(vms);
+                        EnableInputFields();
+                        Console.WriteLine("Insgesamt " + vms.Count + " VMs gefunden.");
+
+                        // Alle VMs in der Console ausgeben
+                        foreach (VM vm in vms)
                         {
-                            UpdateListView(vms);
-                            EnableInputFields();
-                            Console.WriteLine("Insgesamt " + vms.Count + " VMs gefunden.");
-
-                            // Alle VMs in der Console ausgeben
-                            foreach (VM vm in vms)
-                            {
-                                Console.WriteLine(vm.vm_name);
-                            }
-
-                        }
-                        else
-                        {
-                            MessageBox.Show("Keine VMs für "+selectedItem.mission_name+" in der Datenbank gefunden.");
+                            Console.WriteLine(vm.vm_name);
                         }
 
-                   // }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Keine VMs für " + selectedItem.mission_name + " in der Datenbank gefunden.");
+                    }
+
+                    // }
                 }
                 else
                 {
@@ -115,9 +119,9 @@ namespace VirtuSphere
         // check status 
         public void checkStatus()
         {
-            if(vmListToCreate.Count == 0 && vmListToDelete.Count == 0 && vmListToUpdate.Count == 0)
+            if (vmListToCreate.Count == 0 && vmListToDelete.Count == 0 && vmListToUpdate.Count == 0)
             {
-                
+
                 txtStatus.Text = "Status: OK";
 
             }
@@ -230,11 +234,11 @@ namespace VirtuSphere
                 // prüfe ob vm.packages gefüllt ist und gebe die namen der Packages aus
                 if (vm.packages != null)
                 {
-                     foreach (var package in vm.packages)
-                     {
-                         Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
+                    foreach (var package in vm.packages)
+                    {
+                        Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
                         PackagesList += package.package_name + "; ";
-                     }
+                    }
 
 
                     Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
@@ -279,7 +283,7 @@ namespace VirtuSphere
                 if (selectedVM != null)
                 {
                     // Zeige jetzt Informationen aus dem VM-Objekt an, z.B.:
-                   // MessageBox.Show($"ID: {selectedVM.Id}\nName: {selectedVM.vm_name}\nIP: {selectedVM.vm_ip}\nOS: {selectedVM.vm_os}");
+                    // MessageBox.Show($"ID: {selectedVM.Id}\nName: {selectedVM.vm_name}\nIP: {selectedVM.vm_ip}\nOS: {selectedVM.vm_os}");
 
                     // Bearbeite hier das Objekt in der Klasse vms
                     selectedVM.vm_name = txtName.Text;
@@ -425,7 +429,7 @@ namespace VirtuSphere
                 if (selectedVM != null)
                 {
                     // Frage ob wirklich gelöscht werden soll
-                    DialogResult result = MessageBox.Show("Möchten Sie die VM "+(selectedVM.vm_name)+" #"+(selectedVM.Id)+" löschen?", "Bestätigung", MessageBoxButtons.YesNo);
+                    DialogResult result = MessageBox.Show("Möchten Sie die VM " + (selectedVM.vm_name) + " #" + (selectedVM.Id) + " löschen?", "Bestätigung", MessageBoxButtons.YesNo);
 
                     if (result == DialogResult.Yes)
                     {
@@ -477,8 +481,8 @@ namespace VirtuSphere
                     //MessageBox.Show($"Die ID der ausgewählten Mission ist: {selectedItem.Id}");
 
                     // Bestätigungsdialog anzeigen
-                    DialogResult result = MessageBox.Show("Möchten Sie die Mission "+missionName+" wirklich löschen?", "Bestätigung", MessageBoxButtons.YesNo);
-                    if(result == DialogResult.No) { return; }
+                    DialogResult result = MessageBox.Show("Möchten Sie die Mission " + missionName + " wirklich löschen?", "Bestätigung", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.No) { return; }
 
                     DialogResult result2 = MessageBox.Show("Ganz Sicher?", "Bestätigung", MessageBoxButtons.YesNo);
                     if (result2 == DialogResult.No) { return; }
@@ -693,7 +697,7 @@ namespace VirtuSphere
             MissionItem selectedItem = missionBox.SelectedItem as MissionItem;
             if (selectedItem != null)
             {
-                
+
                 foreach (var vm in vmListToCreate)
                 {
                     Console.WriteLine("Mission ID: " + missionId);
@@ -716,14 +720,14 @@ namespace VirtuSphere
                 bool isSuccess3 = true;
 
                 if (vmListToCreate.Count > 0) { isSuccess = await ApiService.VmListToWebAPI("vmListToCreate", hostname, Token, missionId, vmListToCreate); }
-                if(vmListToDelete.Count > 0) { isSuccess2 = await ApiService.VmListToWebAPI("vmListToDelete", hostname, Token, missionId, vmListToDelete); }
-                if(vmListToUpdate.Count > 0) { isSuccess3 = await ApiService.VmListToWebAPI("vmListToUpdate", hostname, Token, missionId, vmListToUpdate); }
+                if (vmListToDelete.Count > 0) { isSuccess2 = await ApiService.VmListToWebAPI("vmListToDelete", hostname, Token, missionId, vmListToDelete); }
+                if (vmListToUpdate.Count > 0) { isSuccess3 = await ApiService.VmListToWebAPI("vmListToUpdate", hostname, Token, missionId, vmListToUpdate); }
 
 
                 if (isSuccess && isSuccess2 && isSuccess3)
                 {
                     MessageBox.Show("Neue VMs: " + vmListToCreate.Count + " - Updated " + vmListToUpdate.Count + " Übertragen und " + vmListToDelete.Count + " gelöscht");
-                    
+
 
                     // Leere vmListToCreate, vmListToDelete und vmListToUpdate
                     vmListToCreate.Clear();
@@ -823,7 +827,7 @@ namespace VirtuSphere
             else
             {
                 MessageBox.Show("Fehler beim Speichern der Mission.");
-                
+
             }
         }
 
@@ -832,7 +836,7 @@ namespace VirtuSphere
             listView1.Items.Clear();
             foreach (var vm in vms)
             {
-                 Console.WriteLine("Funktion UpdateListView: " + vm.vm_name);
+                Console.WriteLine("Funktion UpdateListView: " + vm.vm_name);
                 string PackagesList = "";
                 string InterfaceList = "";
 
@@ -869,7 +873,7 @@ namespace VirtuSphere
                     vm.vm_os,
                     PackagesList,
                     vm.vm_status
-                }) ;
+                });
 
                 lvi.Tag = vm;
 
@@ -987,7 +991,7 @@ namespace VirtuSphere
                 {
                     Console.WriteLine($"Das VM-Objekt mit den Eigenschaften: {vm.vm_name}  fehlt in der Liste listView1.");
                 }
-                else { Console.WriteLine(vm.vm_name+" passt."); }
+                else { Console.WriteLine(vm.vm_name + " passt."); }
             }
         }
 
@@ -1014,7 +1018,7 @@ namespace VirtuSphere
             }
         }
 
-        private async void btnDeploy(object sender, EventArgs e)
+        private void btnDeploy(object sender, EventArgs e)
         {
             var sshConnector = new SshConnector();
 
@@ -1073,9 +1077,9 @@ namespace VirtuSphere
                     }
 
                 }
-               
 
-                if(useSSHKey.Checked)
+
+                if (useSSHKey.Checked)
                 {
 
                     // Erstellt einen Befehl, der prüft, ob der öffentliche Schlüssel bereits in authorized_keys vorhanden ist, und fügt ihn hinzu, falls nicht
@@ -1117,7 +1121,7 @@ namespace VirtuSphere
                 deployItems = sshConnector.ExecuteCommands(ssh_ip, sshport, ssh_user, privateKeyPath, commands);
                 Console.WriteLine("Authentification with private key");
             }
-            
+
 
             // Erstelle eine Instanz von DeployForm
             DeployForm deployForm = new DeployForm();
@@ -1178,6 +1182,35 @@ namespace VirtuSphere
 
         private void generatePlaybooks(object sender, EventArgs e)
         {
+            Console.WriteLine("MissionID: " + missionId);
+            Console.WriteLine("MissionName: " + missionName);
+
+            // prüfe ob notwendige Felder befüllt sind:
+            if (txt_hv_ip.Text == "" || txt_hv_loginname.Text == "" || txt_hv_loginpassword.Text == "" || txt_ssh_user.Text == "")
+            {
+                MessageBox.Show("Bitte füllen Sie alle Felder unter Umgebung aus.");
+                // öffne Tab Umgebung
+                tabControl2.SelectedTab = tabControl2.TabPages["Umgebung"];
+
+                return;
+            }
+
+            // Fehlermeldung wenn MissionName leer ist
+            if (missionName == null)
+            {
+                MessageBox.Show("Bitte wählen Sie eine Mission aus.");
+                return;
+            }
+
+
+            // erstelle missionName Ordner unter temp, wenn nooch nicht existiert
+            string ProjecttempPath = Path.Combine(Path.GetTempPath(), missionName);
+            if (!Directory.Exists(ProjecttempPath))
+            {
+                Directory.CreateDirectory(ProjecttempPath);
+            }
+
+
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var filePath = Path.Combine(basePath, "Ansible", "createVMs-ESXi.yml");
 
@@ -1188,16 +1221,64 @@ namespace VirtuSphere
                     AnsibleForm ansibleForm = new AnsibleForm(vms);
 
                     // createVMs-ESXi
-                    var tempPath = Path.Combine(Path.GetTempPath(), "createVMs-ESXi.yml");
-                    File.Copy(filePath, tempPath, true);
-                    ansibleForm.listFiles.Items.Add(Path.GetFileName(tempPath));
+                    String TargetFile = Path.Combine(ProjecttempPath, "createVMs-ESXi.yml");
+                    ansibleForm.listFiles.Items.Add(Path.GetFileName(Path.Combine(ProjecttempPath, "createVMs-ESXi.yml")));
+                    string serverlist = "vm_configurations:\n";
+                    string interfaces = "";
+                    string packages = ""; 
+                    //File.Copy(filePath, TargetFile, true);
+
+                    // lade inhalt von filePath in einen String
+                    string createVMsContent = File.ReadAllText(filePath);
+
+                    // ersetze in createVMsContent die Variablen
+                    createVMsContent = createVMsContent.Replace("{hypervisor_esxiip}", txt_hv_ip.Text);
+                    createVMsContent = createVMsContent.Replace("{hypervisor_username}", txt_hv_loginname.Text);
+                    createVMsContent = createVMsContent.Replace("{hypervisor_password}", txt_hv_loginpassword.Text);
+                    createVMsContent = createVMsContent.Replace("{ansible_username}", txt_ssh_user.Text);
+
+                    // speichere createVMsContent in TargetFile
+                    File.WriteAllText(TargetFile, createVMsContent);
 
                     // Erstelle serverlist.yml
-                    var serverlistPath = Path.Combine(Path.GetTempPath(), "serverlist.yml");
-                    File.WriteAllText(serverlistPath, "all:\n  hosts:\n    localhost:\n      ansible_connection: local\n");
-                    ansibleForm.listFiles.Items.Add(Path.GetFileName(serverlistPath));
 
-                    // 
+                    // liste vms in console auf
+                    foreach (var vm in vms)
+                    {
+
+                        // Netzwerk und Packages sind eine Liste und die Werte werden durch ein Semikolon getrennt
+                        foreach (Package package in vm.packages)
+                        {
+                            packages += package.package_name + ";";
+                        }
+
+                        foreach (Interface network in vm.interfaces)
+                        {
+                            interfaces += network.vlan + ";";
+                        }
+
+
+
+                        Console.WriteLine("Füge zur Serverliste hinzu: " + vm.vm_name);
+                        serverlist += "  - vm_name: " + vm.vm_name + "\n";
+                        serverlist += "    memory: " + vm.vm_ram + "\n";
+                        serverlist += "    vcpus: " + vm.vm_cpu + "\n";
+                        serverlist += "    disk_size: " + vm.vm_disk + "\n";
+                        serverlist += "    network: " + interfaces + "\n";
+                        serverlist += "    datastore_name: " + vm.vm_datastore + "\n";
+                        serverlist += "    datacenter_name: " + vm.vm_datacenter + "\n";
+                        serverlist += "    guest_id: " + vm.vm_guest_id + "\n";
+                        serverlist += "    packages: " + packages + "\n";
+                        serverlist += "    os   : " + vm.vm_os + "\n";
+                    }
+
+                    if (File.Exists(Path.Combine(ProjecttempPath, "serverlist.yml")))
+                    {
+                        File.Delete(Path.Combine(ProjecttempPath, "serverlist.yml"));
+                    }
+
+                    File.WriteAllText(Path.Combine(ProjecttempPath, "serverlist.yml"), serverlist);
+                    ansibleForm.listFiles.Items.Add(Path.GetFileName(Path.Combine(ProjecttempPath, "serverlist.yml")));
 
 
                     // Liest den Inhalt der Datei
@@ -1229,8 +1310,18 @@ namespace VirtuSphere
                     // Ausgabe in Textbox
                     ansibleForm.txtAnsible.Text = result;
 
+                    // fülle comboPlaybooks mit den werten aus der Liste
+
+                    foreach (ListViewItem item in ansibleForm.listFiles.Items)
+                    {
+                        ansibleForm.comboPlaybooks.Items.Add(item.Text); 
+                    }
+
+                    ansibleForm.comboPlaybooks.SelectedIndex = 0;
 
 
+
+                    ansibleForm.SetMissionName(missionName);
                     ansibleForm.Show();
                 }
                 catch (Exception ex)
@@ -1261,5 +1352,60 @@ namespace VirtuSphere
 
         }
 
+        private void btn_savecredsHypervisor(object sender, EventArgs e)
+        {
+
+            // Speicher die eingetragenden Werte bis zum Computerneustart
+            if (chk_hypervisor_credssave.Checked)
+            {
+                Console.WriteLine("Speichere Hypervisor Zugangsdaten.");
+                Properties.Settings.Default.txt_hv_ip = txt_hv_ip.Text;
+                Properties.Settings.Default.txt_hv_loginname = txt_hv_loginname.Text;
+                Properties.Settings.Default.txt_hv_loginpassword = txt_hv_loginpassword.Text;
+                Properties.Settings.Default.comboHypervisor = comboHypervisor.Text;
+
+                //// Verschlüsseln
+                //byte[] toEncrypt = Encoding.UTF8.GetBytes(txt_hv_loginpassword.Text);
+                //byte[] encrypted = ProtectedData.Protect(toEncrypt, null, DataProtectionScope.CurrentUser);
+
+                //// Speichern der verschlüsselten Daten
+                //Properties.Settings.Default.hv_loginpassword = Convert.ToBase64String(encrypted);
+
+            }
+            else
+            {
+                Console.WriteLine("lösche Hypervisor Zugangsdaten.");
+                Properties.Settings.Default.txt_hv_ip = "";
+                Properties.Settings.Default.txt_hv_loginname = "";
+                Properties.Settings.Default.txt_hv_loginpassword = "";
+                Properties.Settings.Default.comboHypervisor = "";
+            }
+
+            Properties.Settings.Default.Save();
+
+        }
+
+        private void btn_savecredsAnsible(object sender, EventArgs e)
+        {
+            if (chk_ansible_credssave.Checked)
+            {
+                Console.WriteLine("Speichere Ansible Zugangsdaten.");
+                Properties.Settings.Default.txt_ssh_ip = txt_hv_ip.Text;
+                Properties.Settings.Default.txt_ssh_port = txt_hv_loginname.Text;
+                Properties.Settings.Default.txt_ssh_user = txt_hv_loginpassword.Text;
+                Properties.Settings.Default.txt_ssh_password = txt_ssh_user.Text;
+
+            }
+            else
+            {
+                Console.WriteLine("lösche Ansible Zugangsdaten.");
+                Properties.Settings.Default.txt_ssh_ip = "";
+                Properties.Settings.Default.txt_ssh_port = "";
+                Properties.Settings.Default.txt_ssh_user = "";
+                Properties.Settings.Default.txt_ssh_password = "";
+            }
+
+            Properties.Settings.Default.Save();
+        }
     }
 }

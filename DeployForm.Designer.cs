@@ -33,6 +33,7 @@ namespace VirtuSphere
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DeployForm));
             this.DeployListView = new System.Windows.Forms.ListView();
             this.SuspendLayout();
             // 
@@ -48,14 +49,15 @@ namespace VirtuSphere
             this.DeployListView.UseCompatibleStateImageBehavior = false;
             this.DeployListView.View = System.Windows.Forms.View.List;
             // 
-            // Deploy
+            // DeployForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.DeployListView);
-            this.Name = "Deploy";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "DeployForm";
             this.Text = "Deploy";
             this.ResumeLayout(false);
 

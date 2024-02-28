@@ -1,24 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static VirtuSphere.ApiService;
 
 namespace VirtuSphere
 {
-    
+
 
     public partial class AnsibleForm : Form
     {
         private List<VM> vms;
+
+        // mission dir missionName tmp
+
+        private string PathTmp = Path.GetTempPath();
+        private string ProjectPathTmp = "";
+
+        public void SetMissionName(string missionName)
+        {
+            // Verwende missionName hier, z.B. um einen Label-Text zu setzen
+            this.labelMissionName.Text = missionName;
+            ProjectPathTmp = Path.Combine(PathTmp, missionName);
+
+            // selectiere erstes item in listFiles
+            if (listFiles.Items.Count > 0)
+            {
+                listFiles.Items[0].Selected = true;
+            }
+        }
 
 
         public AnsibleForm(List<VM> vms)
@@ -26,85 +36,15 @@ namespace VirtuSphere
             InitializeComponent();
 
             // comboAction
-            combo_action.Items.Add("unmodifiziert");
-            combo_action.SelectedItem = 0;
             this.vms = vms;
+
+
 
         }
 
         public bool modifiziert = false;
         public bool view_modifiziert = false;
-
-
-        private void generateConfigs(object sender, EventArgs e)
-        {
-            modifiziert = true;
-            string serverlist = "vm_configurations:\n";
-            string interfaces = "";
-            string packages = "";
-
-
-
-            //vm_configurations:
-            //    -vm_name: "TestDaniel"
-            //    memory: 4096
-            //    vcpus: 2
-            //    disk_size: 50
-            //    network: "SIDS_SRV_3_Data"
-            //    datastore_name: "DatenSSD"
-            //    datacenter_name: "ha-datacenter"
-            //    guest_id: "windows2019srv_64Guest"
-            //    packages: "Testgruppe;role-install-dhcp;role-install-fs"
-            //    deployment: "ws2k19-standard"
-
-
-            // liste vms in console auf
-            foreach (var vm in vms)
-            {
-
-                // Netzwerk und Packages sind eine Liste und die Werte werden durch ein Semikolon getrennt
-                foreach (Package package in vm.packages)
-                {
-                    packages += package.package_name + ";";
-                }
-
-                foreach (Interface network in vm.interfaces)
-                {
-                    interfaces += network.vlan + ";";
-                }
-
-
-
-                Console.WriteLine("Füge zur Serverliste hinzu: " + vm.vm_name);
-                serverlist += "  - vm_name: " + vm.vm_name + "\n";
-                serverlist += "    memory: " + vm.vm_ram + "\n";
-                serverlist += "    vcpus: " + vm.vm_cpu + "\n";
-                serverlist += "    disk_size: " + vm.vm_disk + "\n";
-                serverlist += "    network: " + interfaces + "\n";
-                serverlist += "    datastore_name: " + vm.vm_datastore + "\n";
-                serverlist += "    datacenter_name: " + vm.vm_datacenter + "\n";
-                serverlist += "    guest_id: " + vm.vm_guest_id + "\n";
-                serverlist += "    packages: " + packages + "\n";
-                serverlist += "    os   : " + vm.vm_os + "\n";
-            }
-
-            // erstelle eine Datei (serverlist.yml) mit dem Inhalt von serverlist unter tmp
-            string path = Path.GetTempPath();
-            // wenn datei serverlist_modi.yml existiert, lösche diese
-            if (File.Exists(Path.Combine(path, "serverlist_modi.yml")))
-            {
-                File.Delete(Path.Combine(path, "serverlist_modi.yml"));
-            }
-
-            File.WriteAllText(Path.Combine(path, "serverlist_modi.yml"), serverlist);
-
-            // füge dn Pfad der Datei in die Liste hinzu
-            listFiles.Items.Add("serverlist_modi.yml");
-
-
-
-            combo_action.Items.Add("modifiziert");
-        }
+        private string selectedItem;
 
 
         private void loadConfig(object sender, EventArgs e)
@@ -116,7 +56,14 @@ namespace VirtuSphere
                 // Anzeigen der Auswahl in einer MessageBox
                 //MessageBox.Show("Ausgewählter Eintrag: " + selectedItem, "Auswahl", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                String path = Path.Combine(Path.GetTempPath(), selectedItem);
+                String path = Path.Combine(ProjectPathTmp, selectedItem);
+                // prüfe ob Filepath existiert
+                if (!File.Exists(path))
+                {
+                    MessageBox.Show("Datei existiert nicht", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 // Lese den Inhalt der Datei
                 string content = File.ReadAllText(path);
 
@@ -132,7 +79,6 @@ namespace VirtuSphere
         public void viewConfigs(object sender, EventArgs e)
         {
             view_modifiziert = true;
-            combo_action.SelectedItem = "modifiziert";
 
 
         }
@@ -148,10 +94,86 @@ namespace VirtuSphere
             if (checkBox1.Checked)
             {
                 txtAnsible.Enabled = true;
+                btnSave.Visible = true;
             }
             else
             {
                 txtAnsible.Enabled = false;
+                btnSave.Visible = false;
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            // combind temp und mission
+            // öffne den Explorer im Ordner Temp
+            System.Diagnostics.Process.Start(ProjectPathTmp);
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+
+            if (listFiles.SelectedItems.Count > 0)
+            { 
+                string selectedItem = listFiles.SelectedItems[0].Text;
+
+                Console.WriteLine("Reload Datei: " + selectedItem);
+
+                String path = Path.Combine(ProjectPathTmp, selectedItem);
+                // prüfe ob Filepath existiert
+                if (File.Exists(path))
+                {
+                    string content = File.ReadAllText(path);
+                    content = content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
+                    txtAnsible.Text = content;
+                    Console.WriteLine("Datei reloaded.");
+                }
+        }
+
+            // leere listFiles
+            listFiles.Items.Clear();
+            // fülle listFiles mit Dateien aus dem Ordner
+            foreach (string file in Directory.GetFiles(ProjectPathTmp))
+            {
+                listFiles.Items.Add(Path.GetFileName(file));
+            }
+
+            // wähle in listFiles test.yml aus
+            foreach (ListViewItem item in listFiles.Items)
+            {
+                if (item.Text == selectedItem)
+                {
+                    item.Selected = true;
+                    break;
+                }
+            }
+            
+
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (listFiles.SelectedItems.Count > 0)
+            {
+                Console.WriteLine("Speichere Datei");
+
+                string selectedItem = listFiles.SelectedItems[0].Text;
+                String path = Path.Combine(ProjectPathTmp, selectedItem);
+                // prüfe ob Filepath existiert
+                if (File.Exists(path))
+                {
+                    File.WriteAllText(path, txtAnsible.Text);
+                }   
+                MessageBox.Show("Datei gespeichert", "Erfolg", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Keine Datei ausgewählt", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

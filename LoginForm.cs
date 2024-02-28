@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 
 
 namespace VirtuSphere
@@ -42,10 +33,11 @@ namespace VirtuSphere
             string username = txtUsername.Text; // Stelle sicher, dass die Feldnamen korrekt sind
             string password = txtPassword.Text;
             string hostname = comboBox1.SelectedItem.ToString();
+            bool usetls = chkbx_tls.Checked;
 
             // ApiService-Instanz sollte bereits verfügbar sein, z.B. über Dependency Injection
             ApiService apiService = new ApiService(); // Erstellen Sie eine Instanz der ApiService-Klasse
-            string token = await apiService.IsValidLogin(username, password, hostname);
+            string token = await apiService.IsValidLogin(username, password, hostname, usetls);
 
 
             if (!string.IsNullOrEmpty(token))

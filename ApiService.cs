@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -29,55 +28,66 @@ namespace VirtuSphere
         }
 
 
-        public async Task<string> IsValidLogin(string username, string password, string hostname)
+        public async Task<string> IsValidLogin(string username, string password, string hostname, bool useTls)
         {
-            //msgbox aller parameter
-            //MessageBox.Show("Username: " + username + " Password: " + password + " Hostname: " + hostname);
-            Console.WriteLine("Username: " + username + " Password: " + password + " Hostname: " + hostname);
-
-            // Beispiel-URL, an deine API anpassen
-
-            string requestUri = $"http://{hostname}/api/login.php";
-            var loginData = new Dictionary<string, string>
+            // Setze die SecurityProtocol nur, wenn useTls wahr ist
+            if (useTls)
             {
-                { "username", username },
-                { "password", password }
-            };
-            var content = new FormUrlEncodedContent(loginData);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            }
 
+            string scheme = useTls ? "https" : "http";
+            string requestUri = $"{scheme}://{hostname}/api/login.php";
+
+            // Prüfung, ob die Adresse erreichbar ist und die Verbindung möglich ist
+            try
+            {
+                // Versuche, eine Kopfzeilenanfrage zu senden, um zu sehen, ob der Host erreichbar ist
+                var headRequest = new HttpRequestMessage(HttpMethod.Head, requestUri);
+                var headResponse = await _httpClient.SendAsync(headRequest);
+                headResponse.EnsureSuccessStatusCode(); // Löst eine Ausnahme aus, wenn der Statuscode außerhalb von 2xx liegt
+
+                // Hier könnte man zusätzlich prüfen, ob eine Verbindung ohne TLS möglich ist,
+                // indem man eine Anfrage über HTTP sendet und die Antwort prüft.
+                // Da dies jedoch ein Sicherheitsrisiko darstellen kann, überspringen wir diesen Schritt.
+
+                // Für die Prüfung des Zertifikats, siehe unten
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Fehler bei der Verbindung: {e.Message}");
+                return null; // Kann als Indikator für nicht erreichbare Adresse oder Verbindungsfehler dienen
+            }
+
+            // Führe die Anmeldeanfrage aus
+            var loginData = new Dictionary<string, string>
+    {
+        { "username", username },
+        { "password", password }
+    };
+            var content = new FormUrlEncodedContent(loginData);
             var response = await _httpClient.PostAsync(requestUri, content);
 
-
-            // schreibe hier einen debug log in die Console verbindung zu hostname
-            Console.WriteLine("Verbindung zu " + hostname + " hergestellt");
-            // resopnse code in die Console schreiben
+            Console.WriteLine($"Verbindung zu {hostname} {(useTls ? "über TLS" : "ohne TLS")} hergestellt");
             Console.WriteLine(response.StatusCode);
-            // response content in die Console schreiben
 
-            // schreib result content in die Console
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(responseContent);
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-
                 dynamic result = JsonConvert.DeserializeObject(responseContent);
-                // gib alles in result aus
-
-
-                // Wenn result nicht null ist und nicht "Access Forbidden" dann gib den Token zurück
                 if (result != null && result != "Access Forbidden")
                 {
-                    // gib token aus
                     Console.WriteLine("Token: " + result);
                     return result;
                 }
-
-                return null;
-
             }
+
             return null; // Bei Fehlschlag
         }
+
+
         public async Task<List<Package>> GetPackages(string hostname, string token)
         {
             string requestUri = $"http://{hostname}/access.php?action=getPackages&token={token}";
@@ -217,14 +227,14 @@ namespace VirtuSphere
                     MessageBox.Show("Token abgelaufen");
                     return false;
                 }
-                if(response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("Mission gelöscht");
                     // Wenn im Response-Code 200 steht, dann gib true zurück
                     return response.IsSuccessStatusCode;
                 }
                 return false;
-                
+
             }
         }
         public async Task<bool> CreateMission(string hostname, string token, string missionName)
@@ -294,7 +304,7 @@ namespace VirtuSphere
                     Console.WriteLine("----------------------");
                     return null;
                 }
-                
+
             }
             Console.WriteLine("----------------------");
             return null; // Bei Fehlschlag oder "Access Forbidden"

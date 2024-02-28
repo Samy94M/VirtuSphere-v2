@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FMmain));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button5 = new System.Windows.Forms.Button();
             this.label9 = new System.Windows.Forms.Label();
@@ -39,52 +40,9 @@
             this.missionBox = new System.Windows.Forms.ComboBox();
             this.txtStatus = new System.Windows.Forms.Label();
             this.btnLoad = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.Liste = new System.Windows.Forms.TabPage();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.vmname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Hostname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Domain = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.os = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Packages = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Umgebung = new System.Windows.Forms.TabPage();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.comboWDSVlan = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.comboAnsibleRemote = new System.Windows.Forms.ComboBox();
-            this.txtAnsibleLocal = new System.Windows.Forms.TextBox();
-            this.label25 = new System.Windows.Forms.Label();
-            this.label24 = new System.Windows.Forms.Label();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.label19 = new System.Windows.Forms.Label();
-            this.txt_ssh_port = new System.Windows.Forms.TextBox();
-            this.useSSHKey = new System.Windows.Forms.CheckBox();
-            this.checkSSHKey = new System.Windows.Forms.CheckBox();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.label22 = new System.Windows.Forms.Label();
-            this.label23 = new System.Windows.Forms.Label();
-            this.txt_ssh_password = new System.Windows.Forms.TextBox();
-            this.txt_ssh_user = new System.Windows.Forms.TextBox();
-            this.txt_ssh_ip = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.comboHypervisor = new System.Windows.Forms.ComboBox();
-            this.lbl_hypervisor = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.button6 = new System.Windows.Forms.Button();
-            this.txt_hv_loginpassword = new System.Windows.Forms.TextBox();
-            this.txt_hv_loginname = new System.Windows.Forms.TextBox();
-            this.txt_hv_ip = new System.Windows.Forms.TextBox();
-            this.button3 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtCPU = new System.Windows.Forms.TextBox();
@@ -106,15 +64,62 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btn_edit = new System.Windows.Forms.Button();
             this.txtHostname = new System.Windows.Forms.TextBox();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.vmname = new System.Windows.Forms.ColumnHeader();
+            this.Hostname = new System.Windows.Forms.ColumnHeader();
+            this.IP = new System.Windows.Forms.ColumnHeader();
+            this.Domain = new System.Windows.Forms.ColumnHeader();
+            this.os = new System.Windows.Forms.ColumnHeader();
+            this.Packages = new System.Windows.Forms.ColumnHeader();
+            this.Status = new System.Windows.Forms.ColumnHeader();
+            this.Umgebung = new System.Windows.Forms.TabPage();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.comboWDSVlan = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.comboAnsibleRemote = new System.Windows.Forms.ComboBox();
+            this.txtAnsibleLocal = new System.Windows.Forms.TextBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.button9 = new System.Windows.Forms.Button();
+            this.chk_ansible_credssave = new System.Windows.Forms.CheckBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txt_ssh_port = new System.Windows.Forms.TextBox();
+            this.useSSHKey = new System.Windows.Forms.CheckBox();
+            this.checkSSHKey = new System.Windows.Forms.CheckBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.txt_ssh_password = new System.Windows.Forms.TextBox();
+            this.txt_ssh_user = new System.Windows.Forms.TextBox();
+            this.txt_ssh_ip = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button7 = new System.Windows.Forms.Button();
+            this.chk_hypervisor_credssave = new System.Windows.Forms.CheckBox();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.comboHypervisor = new System.Windows.Forms.ComboBox();
+            this.lbl_hypervisor = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.button6 = new System.Windows.Forms.Button();
+            this.txt_hv_loginpassword = new System.Windows.Forms.TextBox();
+            this.txt_hv_loginname = new System.Windows.Forms.TextBox();
+            this.txt_hv_ip = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.Liste.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.Umgebung.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -144,7 +149,7 @@
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(108, 43);
             this.button5.TabIndex = 23;
-            this.button5.Text = "Erstelle Playbooks";
+            this.button5.Text = "Ansible";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Click += new System.EventHandler(this.generatePlaybooks);
             // 
@@ -154,7 +159,7 @@
             this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label9.Location = new System.Drawing.Point(1300, 700);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(70, 16);
+            this.label9.Size = new System.Drawing.Size(71, 16);
             this.label9.TabIndex = 22;
             this.label9.Text = "CSV-Datei";
             this.label9.Visible = false;
@@ -197,7 +202,7 @@
             this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label14.Location = new System.Drawing.Point(352, 688);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(56, 16);
+            this.label14.Size = new System.Drawing.Size(57, 16);
             this.label14.TabIndex = 17;
             this.label14.Text = "Mission:";
             // 
@@ -239,6 +244,16 @@
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btn_loadVMsfromDB);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(1023, 687);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(108, 43);
+            this.button3.TabIndex = 5;
+            this.button3.Text = "Deploy";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.btnDeploy);
+            // 
             // tabControl2
             // 
             this.tabControl2.Controls.Add(this.Liste);
@@ -260,420 +275,6 @@
             this.Liste.Size = new System.Drawing.Size(1479, 627);
             this.Liste.TabIndex = 0;
             this.Liste.Text = "Liste";
-            // 
-            // listView1
-            // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.vmname,
-            this.Hostname,
-            this.IP,
-            this.Domain,
-            this.os,
-            this.Packages,
-            this.Status});
-            this.listView1.FullRowSelect = true;
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(6, 6);
-            this.listView1.MultiSelect = false;
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1083, 615);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.VMList_Click);
-            this.listView1.ItemActivate += new System.EventHandler(this.VMList_Click);
-            this.listView1.Click += new System.EventHandler(this.VMList_Click);
-            this.listView1.DoubleClick += new System.EventHandler(this.OpenVmeditForm);
-            // 
-            // vmname
-            // 
-            this.vmname.Text = "VMName";
-            this.vmname.Width = 97;
-            // 
-            // Hostname
-            // 
-            this.Hostname.Text = "Hostname";
-            this.Hostname.Width = 110;
-            // 
-            // IP
-            // 
-            this.IP.Text = "IP";
-            this.IP.Width = 115;
-            // 
-            // Domain
-            // 
-            this.Domain.Text = "Domain";
-            this.Domain.Width = 149;
-            // 
-            // os
-            // 
-            this.os.Text = "Betriebssystem";
-            this.os.Width = 128;
-            // 
-            // Packages
-            // 
-            this.Packages.Text = "Packages";
-            this.Packages.Width = 337;
-            // 
-            // Status
-            // 
-            this.Status.Text = "Status";
-            this.Status.Width = 125;
-            // 
-            // Umgebung
-            // 
-            this.Umgebung.BackColor = System.Drawing.Color.Transparent;
-            this.Umgebung.Controls.Add(this.groupBox6);
-            this.Umgebung.Controls.Add(this.groupBox5);
-            this.Umgebung.Controls.Add(this.groupBox4);
-            this.Umgebung.Controls.Add(this.groupBox3);
-            this.Umgebung.Location = new System.Drawing.Point(4, 22);
-            this.Umgebung.Name = "Umgebung";
-            this.Umgebung.Padding = new System.Windows.Forms.Padding(3);
-            this.Umgebung.Size = new System.Drawing.Size(1479, 627);
-            this.Umgebung.TabIndex = 1;
-            this.Umgebung.Text = "Umgebung";
-            // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.comboWDSVlan);
-            this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Location = new System.Drawing.Point(466, 235);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(428, 136);
-            this.groupBox6.TabIndex = 16;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "WDS";
-            // 
-            // comboWDSVlan
-            // 
-            this.comboWDSVlan.FormattingEnabled = true;
-            this.comboWDSVlan.Location = new System.Drawing.Point(197, 38);
-            this.comboWDSVlan.Name = "comboWDSVlan";
-            this.comboWDSVlan.Size = new System.Drawing.Size(215, 21);
-            this.comboWDSVlan.TabIndex = 14;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(50, 38);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(90, 13);
-            this.label10.TabIndex = 15;
-            this.label10.Text = "Betankungs vlan:";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.checkBox2);
-            this.groupBox5.Controls.Add(this.comboAnsibleRemote);
-            this.groupBox5.Controls.Add(this.txtAnsibleLocal);
-            this.groupBox5.Controls.Add(this.label25);
-            this.groupBox5.Controls.Add(this.label24);
-            this.groupBox5.Location = new System.Drawing.Point(18, 235);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(428, 136);
-            this.groupBox5.TabIndex = 15;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Ansible";
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(197, 91);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(149, 17);
-            this.checkBox2.TabIndex = 15;
-            this.checkBox2.Text = "nach Deployment löschen";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // comboAnsibleRemote
-            // 
-            this.comboAnsibleRemote.FormattingEnabled = true;
-            this.comboAnsibleRemote.Items.AddRange(new object[] {
-            "/tmp",
-            "/home"});
-            this.comboAnsibleRemote.Location = new System.Drawing.Point(197, 64);
-            this.comboAnsibleRemote.Name = "comboAnsibleRemote";
-            this.comboAnsibleRemote.Size = new System.Drawing.Size(215, 21);
-            this.comboAnsibleRemote.TabIndex = 14;
-            // 
-            // txtAnsibleLocal
-            // 
-            this.txtAnsibleLocal.Location = new System.Drawing.Point(197, 38);
-            this.txtAnsibleLocal.Name = "txtAnsibleLocal";
-            this.txtAnsibleLocal.Size = new System.Drawing.Size(215, 20);
-            this.txtAnsibleLocal.TabIndex = 14;
-            // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(57, 67);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(94, 13);
-            this.label25.TabIndex = 15;
-            this.label25.Text = "Playbooks remote:";
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(67, 41);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(84, 13);
-            this.label24.TabIndex = 14;
-            this.label24.Text = "Playbooks lokal:";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.button2);
-            this.groupBox4.Controls.Add(this.label19);
-            this.groupBox4.Controls.Add(this.txt_ssh_port);
-            this.groupBox4.Controls.Add(this.useSSHKey);
-            this.groupBox4.Controls.Add(this.checkSSHKey);
-            this.groupBox4.Controls.Add(this.label20);
-            this.groupBox4.Controls.Add(this.label21);
-            this.groupBox4.Controls.Add(this.label22);
-            this.groupBox4.Controls.Add(this.label23);
-            this.groupBox4.Controls.Add(this.txt_ssh_password);
-            this.groupBox4.Controls.Add(this.txt_ssh_user);
-            this.groupBox4.Controls.Add(this.txt_ssh_ip);
-            this.groupBox4.Location = new System.Drawing.Point(466, 20);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(542, 203);
-            this.groupBox4.TabIndex = 14;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Ansible Server";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(405, 160);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(121, 23);
-            this.button2.TabIndex = 16;
-            this.button2.Text = "Verbindungscheck";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(50, 60);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(29, 13);
-            this.label19.TabIndex = 15;
-            this.label19.Text = "Port:";
-            // 
-            // txt_ssh_port
-            // 
-            this.txt_ssh_port.Location = new System.Drawing.Point(137, 57);
-            this.txt_ssh_port.Name = "txt_ssh_port";
-            this.txt_ssh_port.Size = new System.Drawing.Size(165, 20);
-            this.txt_ssh_port.TabIndex = 14;
-            this.txt_ssh_port.Text = "22";
-            // 
-            // useSSHKey
-            // 
-            this.useSSHKey.AutoSize = true;
-            this.useSSHKey.Location = new System.Drawing.Point(329, 34);
-            this.useSSHKey.Name = "useSSHKey";
-            this.useSSHKey.Size = new System.Drawing.Size(136, 17);
-            this.useSSHKey.TabIndex = 13;
-            this.useSSHKey.Text = "Private Key verwenden";
-            this.useSSHKey.UseVisualStyleBackColor = true;
-            // 
-            // checkSSHKey
-            // 
-            this.checkSSHKey.AutoSize = true;
-            this.checkSSHKey.Location = new System.Drawing.Point(329, 60);
-            this.checkSSHKey.Name = "checkSSHKey";
-            this.checkSSHKey.Size = new System.Drawing.Size(207, 17);
-            this.checkSSHKey.TabIndex = 12;
-            this.checkSSHKey.Text = "Keys erzeugen und remote hinterlegen";
-            this.checkSSHKey.UseVisualStyleBackColor = true;
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(6, 170);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(94, 13);
-            this.label20.TabIndex = 11;
-            this.label20.Text = "Status: unbekannt";
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(50, 116);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(53, 13);
-            this.label21.TabIndex = 8;
-            this.label21.Text = "Passwort:";
-            // 
-            // label22
-            // 
-            this.label22.AutoSize = true;
-            this.label22.Location = new System.Drawing.Point(50, 90);
-            this.label22.Name = "label22";
-            this.label22.Size = new System.Drawing.Size(62, 13);
-            this.label22.TabIndex = 7;
-            this.label22.Text = "Loginname:";
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(50, 34);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(20, 13);
-            this.label23.TabIndex = 3;
-            this.label23.Text = "IP:";
-            // 
-            // txt_ssh_password
-            // 
-            this.txt_ssh_password.Location = new System.Drawing.Point(137, 109);
-            this.txt_ssh_password.Name = "txt_ssh_password";
-            this.txt_ssh_password.PasswordChar = '*';
-            this.txt_ssh_password.Size = new System.Drawing.Size(165, 20);
-            this.txt_ssh_password.TabIndex = 2;
-            // 
-            // txt_ssh_user
-            // 
-            this.txt_ssh_user.Location = new System.Drawing.Point(137, 83);
-            this.txt_ssh_user.Name = "txt_ssh_user";
-            this.txt_ssh_user.Size = new System.Drawing.Size(165, 20);
-            this.txt_ssh_user.TabIndex = 1;
-            // 
-            // txt_ssh_ip
-            // 
-            this.txt_ssh_ip.Location = new System.Drawing.Point(137, 31);
-            this.txt_ssh_ip.Name = "txt_ssh_ip";
-            this.txt_ssh_ip.Size = new System.Drawing.Size(165, 20);
-            this.txt_ssh_ip.TabIndex = 0;
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.checkBox1);
-            this.groupBox3.Controls.Add(this.label16);
-            this.groupBox3.Controls.Add(this.comboHypervisor);
-            this.groupBox3.Controls.Add(this.lbl_hypervisor);
-            this.groupBox3.Controls.Add(this.label6);
-            this.groupBox3.Controls.Add(this.label7);
-            this.groupBox3.Controls.Add(this.label8);
-            this.groupBox3.Controls.Add(this.button6);
-            this.groupBox3.Controls.Add(this.txt_hv_loginpassword);
-            this.groupBox3.Controls.Add(this.txt_hv_loginname);
-            this.groupBox3.Controls.Add(this.txt_hv_ip);
-            this.groupBox3.Location = new System.Drawing.Point(18, 17);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(428, 202);
-            this.groupBox3.TabIndex = 11;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Hypervisor";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(197, 136);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(164, 17);
-            this.checkBox1.TabIndex = 14;
-            this.checkBox1.Text = "Verbindungscheck ignorieren";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(91, 110);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(60, 13);
-            this.label16.TabIndex = 13;
-            this.label16.Text = "Hypervisor:";
-            // 
-            // comboHypervisor
-            // 
-            this.comboHypervisor.FormattingEnabled = true;
-            this.comboHypervisor.Items.AddRange(new object[] {
-            "ESXi",
-            "Hyper-V"});
-            this.comboHypervisor.Location = new System.Drawing.Point(197, 107);
-            this.comboHypervisor.Name = "comboHypervisor";
-            this.comboHypervisor.Size = new System.Drawing.Size(215, 21);
-            this.comboHypervisor.TabIndex = 12;
-            // 
-            // lbl_hypervisor
-            // 
-            this.lbl_hypervisor.AutoSize = true;
-            this.lbl_hypervisor.Location = new System.Drawing.Point(16, 173);
-            this.lbl_hypervisor.Name = "lbl_hypervisor";
-            this.lbl_hypervisor.Size = new System.Drawing.Size(94, 13);
-            this.lbl_hypervisor.TabIndex = 11;
-            this.lbl_hypervisor.Text = "Status: unbekannt";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(98, 88);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(53, 13);
-            this.label6.TabIndex = 8;
-            this.label6.Text = "Passwort:";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(89, 63);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(62, 13);
-            this.label7.TabIndex = 7;
-            this.label7.Text = "Loginname:";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(131, 37);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(20, 13);
-            this.label8.TabIndex = 3;
-            this.label8.Text = "IP:";
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(341, 163);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 23);
-            this.button6.TabIndex = 3;
-            this.button6.Text = "Verbinden";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.btn_connectionHypervisor);
-            // 
-            // txt_hv_loginpassword
-            // 
-            this.txt_hv_loginpassword.Location = new System.Drawing.Point(197, 78);
-            this.txt_hv_loginpassword.Name = "txt_hv_loginpassword";
-            this.txt_hv_loginpassword.PasswordChar = '*';
-            this.txt_hv_loginpassword.Size = new System.Drawing.Size(215, 20);
-            this.txt_hv_loginpassword.TabIndex = 2;
-            // 
-            // txt_hv_loginname
-            // 
-            this.txt_hv_loginname.Location = new System.Drawing.Point(197, 52);
-            this.txt_hv_loginname.Name = "txt_hv_loginname";
-            this.txt_hv_loginname.Size = new System.Drawing.Size(215, 20);
-            this.txt_hv_loginname.TabIndex = 1;
-            // 
-            // txt_hv_ip
-            // 
-            this.txt_hv_ip.Location = new System.Drawing.Point(197, 30);
-            this.txt_hv_ip.Name = "txt_hv_ip";
-            this.txt_hv_ip.Size = new System.Drawing.Size(215, 20);
-            this.txt_hv_ip.TabIndex = 0;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(1023, 687);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(108, 43);
-            this.button3.TabIndex = 5;
-            this.button3.Text = "Deploy";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.btnDeploy);
             // 
             // groupBox2
             // 
@@ -886,6 +487,460 @@
             this.txtHostname.Size = new System.Drawing.Size(215, 20);
             this.txtHostname.TabIndex = 1;
             // 
+            // listView1
+            // 
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.vmname,
+            this.Hostname,
+            this.IP,
+            this.Domain,
+            this.os,
+            this.Packages,
+            this.Status});
+            this.listView1.FullRowSelect = true;
+            this.listView1.HideSelection = false;
+            this.listView1.Location = new System.Drawing.Point(6, 6);
+            this.listView1.MultiSelect = false;
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(1083, 615);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.VMList_Click);
+            this.listView1.ItemActivate += new System.EventHandler(this.VMList_Click);
+            this.listView1.Click += new System.EventHandler(this.VMList_Click);
+            this.listView1.DoubleClick += new System.EventHandler(this.OpenVmeditForm);
+            // 
+            // vmname
+            // 
+            this.vmname.Text = "VMName";
+            this.vmname.Width = 97;
+            // 
+            // Hostname
+            // 
+            this.Hostname.Text = "Hostname";
+            this.Hostname.Width = 110;
+            // 
+            // IP
+            // 
+            this.IP.Text = "IP";
+            this.IP.Width = 115;
+            // 
+            // Domain
+            // 
+            this.Domain.Text = "Domain";
+            this.Domain.Width = 149;
+            // 
+            // os
+            // 
+            this.os.Text = "Betriebssystem";
+            this.os.Width = 128;
+            // 
+            // Packages
+            // 
+            this.Packages.Text = "Packages";
+            this.Packages.Width = 337;
+            // 
+            // Status
+            // 
+            this.Status.Text = "Status";
+            this.Status.Width = 125;
+            // 
+            // Umgebung
+            // 
+            this.Umgebung.BackColor = System.Drawing.Color.Transparent;
+            this.Umgebung.Controls.Add(this.groupBox6);
+            this.Umgebung.Controls.Add(this.groupBox5);
+            this.Umgebung.Controls.Add(this.groupBox4);
+            this.Umgebung.Controls.Add(this.groupBox3);
+            this.Umgebung.Location = new System.Drawing.Point(4, 22);
+            this.Umgebung.Name = "Umgebung";
+            this.Umgebung.Padding = new System.Windows.Forms.Padding(3);
+            this.Umgebung.Size = new System.Drawing.Size(1479, 627);
+            this.Umgebung.TabIndex = 1;
+            this.Umgebung.Text = "Umgebung";
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.comboWDSVlan);
+            this.groupBox6.Controls.Add(this.label10);
+            this.groupBox6.Location = new System.Drawing.Point(466, 250);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(428, 136);
+            this.groupBox6.TabIndex = 16;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "WDS";
+            // 
+            // comboWDSVlan
+            // 
+            this.comboWDSVlan.FormattingEnabled = true;
+            this.comboWDSVlan.Location = new System.Drawing.Point(197, 38);
+            this.comboWDSVlan.Name = "comboWDSVlan";
+            this.comboWDSVlan.Size = new System.Drawing.Size(215, 21);
+            this.comboWDSVlan.TabIndex = 14;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(50, 38);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(90, 13);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "Betankungs vlan:";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.checkBox2);
+            this.groupBox5.Controls.Add(this.comboAnsibleRemote);
+            this.groupBox5.Controls.Add(this.txtAnsibleLocal);
+            this.groupBox5.Controls.Add(this.label25);
+            this.groupBox5.Controls.Add(this.label24);
+            this.groupBox5.Location = new System.Drawing.Point(18, 250);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(428, 136);
+            this.groupBox5.TabIndex = 15;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Ansible";
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(197, 91);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(149, 17);
+            this.checkBox2.TabIndex = 15;
+            this.checkBox2.Text = "nach Deployment löschen";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // comboAnsibleRemote
+            // 
+            this.comboAnsibleRemote.FormattingEnabled = true;
+            this.comboAnsibleRemote.Items.AddRange(new object[] {
+            "/tmp",
+            "/home"});
+            this.comboAnsibleRemote.Location = new System.Drawing.Point(197, 64);
+            this.comboAnsibleRemote.Name = "comboAnsibleRemote";
+            this.comboAnsibleRemote.Size = new System.Drawing.Size(215, 21);
+            this.comboAnsibleRemote.TabIndex = 14;
+            // 
+            // txtAnsibleLocal
+            // 
+            this.txtAnsibleLocal.Location = new System.Drawing.Point(197, 38);
+            this.txtAnsibleLocal.Name = "txtAnsibleLocal";
+            this.txtAnsibleLocal.Size = new System.Drawing.Size(215, 20);
+            this.txtAnsibleLocal.TabIndex = 14;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(57, 67);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(94, 13);
+            this.label25.TabIndex = 15;
+            this.label25.Text = "Playbooks remote:";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(67, 41);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(84, 13);
+            this.label24.TabIndex = 14;
+            this.label24.Text = "Playbooks lokal:";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.button9);
+            this.groupBox4.Controls.Add(this.chk_ansible_credssave);
+            this.groupBox4.Controls.Add(this.button2);
+            this.groupBox4.Controls.Add(this.label19);
+            this.groupBox4.Controls.Add(this.txt_ssh_port);
+            this.groupBox4.Controls.Add(this.useSSHKey);
+            this.groupBox4.Controls.Add(this.checkSSHKey);
+            this.groupBox4.Controls.Add(this.label20);
+            this.groupBox4.Controls.Add(this.label21);
+            this.groupBox4.Controls.Add(this.label22);
+            this.groupBox4.Controls.Add(this.label23);
+            this.groupBox4.Controls.Add(this.txt_ssh_password);
+            this.groupBox4.Controls.Add(this.txt_ssh_user);
+            this.groupBox4.Controls.Add(this.txt_ssh_ip);
+            this.groupBox4.Location = new System.Drawing.Point(466, 20);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(542, 224);
+            this.groupBox4.TabIndex = 14;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Ansible Server";
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(329, 189);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(75, 23);
+            this.button9.TabIndex = 20;
+            this.button9.Text = "Speichern";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.btn_savecredsAnsible);
+            // 
+            // chk_ansible_credssave
+            // 
+            this.chk_ansible_credssave.AutoSize = true;
+            this.chk_ansible_credssave.Checked = true;
+            this.chk_ansible_credssave.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_ansible_credssave.Location = new System.Drawing.Point(329, 33);
+            this.chk_ansible_credssave.Name = "chk_ansible_credssave";
+            this.chk_ansible_credssave.Size = new System.Drawing.Size(133, 17);
+            this.chk_ansible_credssave.TabIndex = 17;
+            this.chk_ansible_credssave.Text = "Zugangsdaten merken";
+            this.chk_ansible_credssave.UseVisualStyleBackColor = true;
+            this.chk_ansible_credssave.CheckedChanged += new System.EventHandler(this.btn_savecredsAnsible);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(406, 189);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(121, 23);
+            this.button2.TabIndex = 16;
+            this.button2.Text = "Verbindungscheck";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(50, 60);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(29, 13);
+            this.label19.TabIndex = 15;
+            this.label19.Text = "Port:";
+            // 
+            // txt_ssh_port
+            // 
+            this.txt_ssh_port.Location = new System.Drawing.Point(137, 57);
+            this.txt_ssh_port.Name = "txt_ssh_port";
+            this.txt_ssh_port.Size = new System.Drawing.Size(165, 20);
+            this.txt_ssh_port.TabIndex = 14;
+            this.txt_ssh_port.Text = "22";
+            // 
+            // useSSHKey
+            // 
+            this.useSSHKey.AutoSize = true;
+            this.useSSHKey.Location = new System.Drawing.Point(329, 59);
+            this.useSSHKey.Name = "useSSHKey";
+            this.useSSHKey.Size = new System.Drawing.Size(136, 17);
+            this.useSSHKey.TabIndex = 13;
+            this.useSSHKey.Text = "Private Key verwenden";
+            this.useSSHKey.UseVisualStyleBackColor = true;
+            // 
+            // checkSSHKey
+            // 
+            this.checkSSHKey.AutoSize = true;
+            this.checkSSHKey.Location = new System.Drawing.Point(329, 84);
+            this.checkSSHKey.Name = "checkSSHKey";
+            this.checkSSHKey.Size = new System.Drawing.Size(207, 17);
+            this.checkSSHKey.TabIndex = 12;
+            this.checkSSHKey.Text = "Keys erzeugen und remote hinterlegen";
+            this.checkSSHKey.UseVisualStyleBackColor = true;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(6, 199);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(94, 13);
+            this.label20.TabIndex = 11;
+            this.label20.Text = "Status: unbekannt";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(50, 116);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(53, 13);
+            this.label21.TabIndex = 8;
+            this.label21.Text = "Passwort:";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(50, 90);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(62, 13);
+            this.label22.TabIndex = 7;
+            this.label22.Text = "Loginname:";
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(50, 34);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(20, 13);
+            this.label23.TabIndex = 3;
+            this.label23.Text = "IP:";
+            // 
+            // txt_ssh_password
+            // 
+            this.txt_ssh_password.Location = new System.Drawing.Point(137, 109);
+            this.txt_ssh_password.Name = "txt_ssh_password";
+            this.txt_ssh_password.PasswordChar = '*';
+            this.txt_ssh_password.Size = new System.Drawing.Size(165, 20);
+            this.txt_ssh_password.TabIndex = 2;
+            // 
+            // txt_ssh_user
+            // 
+            this.txt_ssh_user.Location = new System.Drawing.Point(137, 83);
+            this.txt_ssh_user.Name = "txt_ssh_user";
+            this.txt_ssh_user.Size = new System.Drawing.Size(165, 20);
+            this.txt_ssh_user.TabIndex = 1;
+            // 
+            // txt_ssh_ip
+            // 
+            this.txt_ssh_ip.Location = new System.Drawing.Point(137, 31);
+            this.txt_ssh_ip.Name = "txt_ssh_ip";
+            this.txt_ssh_ip.Size = new System.Drawing.Size(165, 20);
+            this.txt_ssh_ip.TabIndex = 0;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.button7);
+            this.groupBox3.Controls.Add(this.chk_hypervisor_credssave);
+            this.groupBox3.Controls.Add(this.checkBox1);
+            this.groupBox3.Controls.Add(this.label16);
+            this.groupBox3.Controls.Add(this.comboHypervisor);
+            this.groupBox3.Controls.Add(this.lbl_hypervisor);
+            this.groupBox3.Controls.Add(this.label6);
+            this.groupBox3.Controls.Add(this.label7);
+            this.groupBox3.Controls.Add(this.label8);
+            this.groupBox3.Controls.Add(this.button6);
+            this.groupBox3.Controls.Add(this.txt_hv_loginpassword);
+            this.groupBox3.Controls.Add(this.txt_hv_loginname);
+            this.groupBox3.Controls.Add(this.txt_hv_ip);
+            this.groupBox3.Location = new System.Drawing.Point(18, 17);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(428, 227);
+            this.groupBox3.TabIndex = 11;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Hypervisor";
+            // 
+            // button7
+            // 
+            this.button7.Location = new System.Drawing.Point(271, 197);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(75, 23);
+            this.button7.TabIndex = 19;
+            this.button7.Text = "Speichern";
+            this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.btn_savecredsHypervisor);
+            // 
+            // chk_hypervisor_credssave
+            // 
+            this.chk_hypervisor_credssave.AutoSize = true;
+            this.chk_hypervisor_credssave.Checked = true;
+            this.chk_hypervisor_credssave.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_hypervisor_credssave.Location = new System.Drawing.Point(197, 159);
+            this.chk_hypervisor_credssave.Name = "chk_hypervisor_credssave";
+            this.chk_hypervisor_credssave.Size = new System.Drawing.Size(133, 17);
+            this.chk_hypervisor_credssave.TabIndex = 18;
+            this.chk_hypervisor_credssave.Text = "Zugangsdaten merken";
+            this.chk_hypervisor_credssave.UseVisualStyleBackColor = true;
+            this.chk_hypervisor_credssave.CheckedChanged += new System.EventHandler(this.btn_savecredsHypervisor);
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(197, 136);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(164, 17);
+            this.checkBox1.TabIndex = 14;
+            this.checkBox1.Text = "Verbindungscheck ignorieren";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(91, 110);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(60, 13);
+            this.label16.TabIndex = 13;
+            this.label16.Text = "Hypervisor:";
+            // 
+            // comboHypervisor
+            // 
+            this.comboHypervisor.FormattingEnabled = true;
+            this.comboHypervisor.Items.AddRange(new object[] {
+            "ESXi",
+            "Hyper-V"});
+            this.comboHypervisor.Location = new System.Drawing.Point(197, 107);
+            this.comboHypervisor.Name = "comboHypervisor";
+            this.comboHypervisor.Size = new System.Drawing.Size(215, 21);
+            this.comboHypervisor.TabIndex = 12;
+            // 
+            // lbl_hypervisor
+            // 
+            this.lbl_hypervisor.AutoSize = true;
+            this.lbl_hypervisor.Location = new System.Drawing.Point(6, 202);
+            this.lbl_hypervisor.Name = "lbl_hypervisor";
+            this.lbl_hypervisor.Size = new System.Drawing.Size(94, 13);
+            this.lbl_hypervisor.TabIndex = 11;
+            this.lbl_hypervisor.Text = "Status: unbekannt";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(98, 88);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(53, 13);
+            this.label6.TabIndex = 8;
+            this.label6.Text = "Passwort:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(89, 63);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(62, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Loginname:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(131, 37);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(20, 13);
+            this.label8.TabIndex = 3;
+            this.label8.Text = "IP:";
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(347, 197);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(75, 23);
+            this.button6.TabIndex = 3;
+            this.button6.Text = "Verbinden";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.btn_connectionHypervisor);
+            // 
+            // txt_hv_loginpassword
+            // 
+            this.txt_hv_loginpassword.Location = new System.Drawing.Point(197, 78);
+            this.txt_hv_loginpassword.Name = "txt_hv_loginpassword";
+            this.txt_hv_loginpassword.PasswordChar = '*';
+            this.txt_hv_loginpassword.Size = new System.Drawing.Size(215, 20);
+            this.txt_hv_loginpassword.TabIndex = 2;
+            // 
+            // txt_hv_loginname
+            // 
+            this.txt_hv_loginname.Location = new System.Drawing.Point(197, 56);
+            this.txt_hv_loginname.Name = "txt_hv_loginname";
+            this.txt_hv_loginname.Size = new System.Drawing.Size(215, 20);
+            this.txt_hv_loginname.TabIndex = 1;
+            // 
+            // txt_hv_ip
+            // 
+            this.txt_hv_ip.Location = new System.Drawing.Point(197, 30);
+            this.txt_hv_ip.Name = "txt_hv_ip";
+            this.txt_hv_ip.Size = new System.Drawing.Size(215, 20);
+            this.txt_hv_ip.TabIndex = 0;
+            // 
             // FMmain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -893,12 +948,16 @@
             this.ClientSize = new System.Drawing.Size(1528, 776);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "FMmain";
             this.Text = "VirtuSphere";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.tabControl2.ResumeLayout(false);
             this.Liste.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.Umgebung.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
@@ -908,8 +967,6 @@
             this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -994,6 +1051,10 @@
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.ComboBox comboWDSVlan;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox chk_ansible_credssave;
+        private System.Windows.Forms.CheckBox chk_hypervisor_credssave;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button7;
     }
 }
 

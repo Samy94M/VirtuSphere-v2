@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using static VirtuSphere.ApiService;
 using static VirtuSphere.FMmain;
 
@@ -48,8 +44,8 @@ namespace VirtuSphere
 
 
                 // Erstelle eine Instanz deines MainForm
-                FMmain mainForm = new FMmain(); 
-                                                
+                FMmain mainForm = new FMmain();
+
                 //Variablen übergaben
                 String Token = loginForm.Token;
                 String hostname = loginForm.hostname;
@@ -63,7 +59,7 @@ namespace VirtuSphere
                 mainForm.packageItems = PackagesList;
                 Application.Run(mainForm);
 
-                
+
             }
         }
 

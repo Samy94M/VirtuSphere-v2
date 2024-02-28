@@ -1,14 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using static VirtuSphere.ApiService;
 using static VirtuSphere.FMmain;
 
@@ -49,7 +43,7 @@ namespace VirtuSphere
         private void btnSave_Click(object sender, EventArgs e)
         {
             UpdateVMFromFormFields(selectedVM);
-            
+
         }
 
         public async void UpdateVMFromFormFields(VM selectedVM)
@@ -83,7 +77,7 @@ namespace VirtuSphere
                 if (!Form1.vmListToCreate.Contains(selectedVM))
                 {
                     Form1.vmListToUpdate.Add(selectedVM);
-                    
+
                 }
                 Form1.checkStatus();
 
@@ -96,8 +90,8 @@ namespace VirtuSphere
                     if (interfaceToAdd != null)
                     {
                         selectedVM.interfaces.Add(interfaceToAdd);
-                    
-                    if(interfaceToAdd.ip != null) Console.WriteLine("UpdateVMFromFormFields: " + interfaceToAdd.ip);
+
+                        if (interfaceToAdd.ip != null) Console.WriteLine("UpdateVMFromFormFields: " + interfaceToAdd.ip);
 
                     }
                 }
@@ -131,36 +125,36 @@ namespace VirtuSphere
         }
 
 
-            private async Task<List<Package>> GetSelectedPackages(ApiService apiService)
+        private async Task<List<Package>> GetSelectedPackages(ApiService apiService)
+        {
+            string hostname = Form1.hostname;
+            string token = Form1.Token;
+
+            List<Package> selectedPackages = new List<Package>();
+            var allPackageItems = await apiService.GetPackages(hostname, token); // Warten auf das Task-Ergebnis
+
+            if (allPackageItems != null) // Prüfen, ob das Ergebnis nicht null ist
             {
-                string hostname = Form1.hostname;
-                string token = Form1.Token;
-
-                List<Package> selectedPackages = new List<Package>();
-                var allPackageItems = await apiService.GetPackages(hostname, token); // Warten auf das Task-Ergebnis
-
-                if (allPackageItems != null) // Prüfen, ob das Ergebnis nicht null ist
+                foreach (var selectedItem in listBoxPackages2.SelectedItems)
                 {
-                    foreach (var selectedItem in listBoxPackages2.SelectedItems)
+                    // Annahme: 'selectedItem' ist der Name des Pakets, der in der ListBox angezeigt wird.
+                    var packageItem = allPackageItems.FirstOrDefault(p => p.package_name == selectedItem.ToString());
+                    if (packageItem != null)
                     {
-                        // Annahme: 'selectedItem' ist der Name des Pakets, der in der ListBox angezeigt wird.
-                        var packageItem = allPackageItems.FirstOrDefault(p => p.package_name == selectedItem.ToString());
-                        if (packageItem != null)
+                        Package package = new Package
                         {
-                            Package package = new Package
-                            {
-                                id = packageItem.id,
-                                package_name = packageItem.package_name,
-                                package_version = packageItem.package_version,
-                                package_status = packageItem.package_status
-                            };
-                            selectedPackages.Add(package);
-                            Console.WriteLine("GetSelectedPackages Selected Package: " + package.package_name);
-                        }
+                            id = packageItem.id,
+                            package_name = packageItem.package_name,
+                            package_version = packageItem.package_version,
+                            package_status = packageItem.package_status
+                        };
+                        selectedPackages.Add(package);
+                        Console.WriteLine("GetSelectedPackages Selected Package: " + package.package_name);
                     }
                 }
-                return selectedPackages;
             }
+            return selectedPackages;
+        }
 
         private async void LoadVMToFormFields(VM vm)
         {
@@ -170,7 +164,7 @@ namespace VirtuSphere
             txtd_domain.Text = selectedVM.vm_domain;
             txtd_os.Text = selectedVM.vm_os;
             txtd_ram.Text = selectedVM.vm_ram; // Stellen Sie sicher, dass vm_ram ein String ist
-                                                          // vmeditForm.txtd_cpu.Text = selectedVM.vm_cpu; // Stellen Sie sicher, dass vm_cpu definiert ist und ein String ist
+                                               // vmeditForm.txtd_cpu.Text = selectedVM.vm_cpu; // Stellen Sie sicher, dass vm_cpu definiert ist und ein String ist
             txtd_disk.Text = selectedVM.vm_disk;
             txtd_datacenter.Text = selectedVM.vm_datacenter;
             txtd_datastore.Text = selectedVM.vm_datastore;
@@ -190,7 +184,7 @@ namespace VirtuSphere
             txtd_updated_at.Enabled = false;
 
             // lade packages
-             await GetSelectedPackages(ApiService); // Warten auf das Task-Ergebnis
+            await GetSelectedPackages(ApiService); // Warten auf das Task-Ergebnis
 
             // lade vlans mit ApiService.GetVLANs in die ComboVLAN
             List<VLANItem> vlanItems = await ApiService.GetVLANs(Form1.hostname, Form1.Token);
@@ -275,7 +269,7 @@ namespace VirtuSphere
                 // Setzen der Selected-Eigenschaft basierend auf der Übereinstimmung
                 listBoxPackages2.SetSelected(i, isSelected);
 
-                if(isSelected) {  Console.Write(item.ToString() + " is selected"); }
+                if (isSelected) { Console.Write(item.ToString() + " is selected"); }
             }
         }
 
@@ -367,7 +361,7 @@ namespace VirtuSphere
                     txtDNS1.Enabled = false;
                     txtDNS2.Enabled = false;
                 }
-                
+
 
                 // Optional: Leeren der Formularfelder nach der Bearbeitung
                 //ClearInterfaceDetails();

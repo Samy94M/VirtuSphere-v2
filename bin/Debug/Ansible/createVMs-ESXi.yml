@@ -4,9 +4,9 @@
   vars_files:
     - ./serverlist.yml
   vars:
-    esxi_hostname: "{ansible_esxiip}"
-    esxi_username: "{ansible_username}"
-    esxi_password: "{ansible_password}"  
+    esxi_hostname: "{hypervisor_esxiip}"
+    esxi_username: "{hypervisor_username}"
+    esxi_password: "{hypervisor_password}"  
     ansible_username: "{ansible_username}"
 
   tasks:
