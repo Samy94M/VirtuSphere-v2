@@ -162,17 +162,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VirtuSphere.exe" size="91576">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="VirtuSphere.exe" size="121784">
       <assemblyIdentity name="VirtuSphere" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>Z7HQ9ljWjJmxfowm8Wgwh394N4yRWFsruGj3Q21ZL3M=</dsig:DigestValue>
+        <dsig:DigestValue>/dDUYvm2zN5Tv4wIGtPpF2Llsc4C8a+VoNvm3EvpPPA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
+  <file name="Ansible\createVMs-ESXi.yml" size="5748">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+      <dsig:DigestValue>XeHQfFKnUBZodi8plWR0dOAxpFznuZZrd7Nqql+U4Dg=</dsig:DigestValue>
+    </hash>
+  </file>
   <file name="VirtuSphere.exe.config" size="189">
     <hash>
       <dsig:Transforms>

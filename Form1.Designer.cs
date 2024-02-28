@@ -37,7 +37,7 @@
             this.label14 = new System.Windows.Forms.Label();
             this.saveVMsinMission = new System.Windows.Forms.Button();
             this.missionBox = new System.Windows.Forms.ComboBox();
-            this.label12 = new System.Windows.Forms.Label();
+            this.txtStatus = new System.Windows.Forms.Label();
             this.btnLoad = new System.Windows.Forms.Button();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.Liste = new System.Windows.Forms.TabPage();
@@ -45,17 +45,16 @@
             this.vmname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Hostname = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Subnet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Gateway = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.DNS1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.DNS2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Domain = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.VLAN = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.os = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Packages = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Umgebung = new System.Windows.Forms.TabPage();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.comboWDSVlan = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.comboAnsibleRemote = new System.Windows.Forms.ComboBox();
             this.txtAnsibleLocal = new System.Windows.Forms.TextBox();
             this.label25 = new System.Windows.Forms.Label();
@@ -87,6 +86,12 @@
             this.txt_hv_ip = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtCPU = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtHDD = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtRAM = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
             this.txtName = new System.Windows.Forms.TextBox();
             this.listBoxOS = new System.Windows.Forms.ComboBox();
@@ -94,29 +99,18 @@
             this.btn_clear = new System.Windows.Forms.Button();
             this.label15 = new System.Windows.Forms.Label();
             this.txtDomain = new System.Windows.Forms.TextBox();
-            this.comboVLAN = new System.Windows.Forms.ComboBox();
             this.btn_delete = new System.Windows.Forms.Button();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtDNS2 = new System.Windows.Forms.TextBox();
-            this.txtDNS1 = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtGateway = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.listBoxPackages = new System.Windows.Forms.ListBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.btn_add = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.btn_edit = new System.Windows.Forms.Button();
-            this.txtSubnet = new System.Windows.Forms.TextBox();
-            this.txtIP = new System.Windows.Forms.TextBox();
             this.txtHostname = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.Liste.SuspendLayout();
             this.Umgebung.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -133,11 +127,10 @@
             this.groupBox1.Controls.Add(this.label14);
             this.groupBox1.Controls.Add(this.saveVMsinMission);
             this.groupBox1.Controls.Add(this.missionBox);
-            this.groupBox1.Controls.Add(this.label12);
+            this.groupBox1.Controls.Add(this.txtStatus);
             this.groupBox1.Controls.Add(this.btnLoad);
-            this.groupBox1.Controls.Add(this.tabControl2);
             this.groupBox1.Controls.Add(this.button3);
-            this.groupBox1.Controls.Add(this.groupBox2);
+            this.groupBox1.Controls.Add(this.tabControl2);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(1504, 752);
@@ -153,6 +146,7 @@
             this.button5.TabIndex = 23;
             this.button5.Text = "Erstelle Playbooks";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.generatePlaybooks);
             // 
             // label9
             // 
@@ -163,6 +157,7 @@
             this.label9.Size = new System.Drawing.Size(70, 16);
             this.label9.TabIndex = 22;
             this.label9.Text = "CSV-Datei";
+            this.label9.Visible = false;
             // 
             // button8
             // 
@@ -182,6 +177,7 @@
             this.button4.TabIndex = 19;
             this.button4.Text = "Import";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Visible = false;
             this.button4.Click += new System.EventHandler(this.btnCSVImportClick);
             // 
             // button1
@@ -192,6 +188,7 @@
             this.button1.TabIndex = 18;
             this.button1.Text = "Export";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.btnCSVExportClick);
             // 
             // label14
@@ -223,14 +220,14 @@
             this.missionBox.TabIndex = 15;
             this.missionBox.SelectionChangeCommitted += new System.EventHandler(this.MissionChange);
             // 
-            // label12
+            // txtStatus
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(13, 728);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(101, 13);
-            this.label12.TabIndex = 12;
-            this.label12.Text = "Status: Restzeit hier";
+            this.txtStatus.AutoSize = true;
+            this.txtStatus.Location = new System.Drawing.Point(13, 728);
+            this.txtStatus.Name = "txtStatus";
+            this.txtStatus.Size = new System.Drawing.Size(101, 13);
+            this.txtStatus.TabIndex = 12;
+            this.txtStatus.Text = "Status: Restzeit hier";
             // 
             // btnLoad
             // 
@@ -238,7 +235,7 @@
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(108, 28);
             this.btnLoad.TabIndex = 14;
-            this.btnLoad.Text = "Laden";
+            this.btnLoad.Text = "Reload";
             this.btnLoad.UseVisualStyleBackColor = true;
             this.btnLoad.Click += new System.EventHandler(this.btn_loadVMsfromDB);
             // 
@@ -249,19 +246,20 @@
             this.tabControl2.Location = new System.Drawing.Point(6, 19);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(1129, 653);
+            this.tabControl2.Size = new System.Drawing.Size(1487, 653);
             this.tabControl2.TabIndex = 13;
             // 
             // Liste
             // 
+            this.Liste.BackColor = System.Drawing.Color.Transparent;
+            this.Liste.Controls.Add(this.groupBox2);
             this.Liste.Controls.Add(this.listView1);
             this.Liste.Location = new System.Drawing.Point(4, 22);
             this.Liste.Name = "Liste";
             this.Liste.Padding = new System.Windows.Forms.Padding(3);
-            this.Liste.Size = new System.Drawing.Size(1121, 627);
+            this.Liste.Size = new System.Drawing.Size(1479, 627);
             this.Liste.TabIndex = 0;
             this.Liste.Text = "Liste";
-            this.Liste.UseVisualStyleBackColor = true;
             // 
             // listView1
             // 
@@ -269,12 +267,7 @@
             this.vmname,
             this.Hostname,
             this.IP,
-            this.Subnet,
-            this.Gateway,
-            this.DNS1,
-            this.DNS2,
             this.Domain,
-            this.VLAN,
             this.os,
             this.Packages,
             this.Status});
@@ -283,67 +276,44 @@
             this.listView1.Location = new System.Drawing.Point(6, 6);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1109, 615);
+            this.listView1.Size = new System.Drawing.Size(1083, 615);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
             this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.VMList_Click);
             this.listView1.ItemActivate += new System.EventHandler(this.VMList_Click);
             this.listView1.Click += new System.EventHandler(this.VMList_Click);
-            this.listView1.DoubleClick += new System.EventHandler(this.VMList_Click);
+            this.listView1.DoubleClick += new System.EventHandler(this.OpenVmeditForm);
             // 
             // vmname
             // 
             this.vmname.Text = "VMName";
-            this.vmname.Width = 79;
+            this.vmname.Width = 97;
             // 
             // Hostname
             // 
             this.Hostname.Text = "Hostname";
-            this.Hostname.Width = 94;
+            this.Hostname.Width = 110;
             // 
             // IP
             // 
             this.IP.Text = "IP";
-            this.IP.Width = 102;
-            // 
-            // Subnet
-            // 
-            this.Subnet.Text = "Subnetnetz";
-            this.Subnet.Width = 96;
-            // 
-            // Gateway
-            // 
-            this.Gateway.Text = "Gateway";
-            // 
-            // DNS1
-            // 
-            this.DNS1.Text = "DNS1";
-            this.DNS1.Width = 81;
-            // 
-            // DNS2
-            // 
-            this.DNS2.Text = "DNS2";
-            this.DNS2.Width = 71;
+            this.IP.Width = 115;
             // 
             // Domain
             // 
             this.Domain.Text = "Domain";
-            this.Domain.Width = 82;
-            // 
-            // VLAN
-            // 
-            this.VLAN.Text = "VLAN";
+            this.Domain.Width = 149;
             // 
             // os
             // 
             this.os.Text = "Betriebssystem";
-            this.os.Width = 73;
+            this.os.Width = 128;
             // 
             // Packages
             // 
             this.Packages.Text = "Packages";
-            this.Packages.Width = 129;
+            this.Packages.Width = 337;
             // 
             // Status
             // 
@@ -353,28 +323,68 @@
             // Umgebung
             // 
             this.Umgebung.BackColor = System.Drawing.Color.Transparent;
+            this.Umgebung.Controls.Add(this.groupBox6);
             this.Umgebung.Controls.Add(this.groupBox5);
             this.Umgebung.Controls.Add(this.groupBox4);
             this.Umgebung.Controls.Add(this.groupBox3);
             this.Umgebung.Location = new System.Drawing.Point(4, 22);
             this.Umgebung.Name = "Umgebung";
             this.Umgebung.Padding = new System.Windows.Forms.Padding(3);
-            this.Umgebung.Size = new System.Drawing.Size(1121, 627);
+            this.Umgebung.Size = new System.Drawing.Size(1479, 627);
             this.Umgebung.TabIndex = 1;
             this.Umgebung.Text = "Umgebung";
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.comboWDSVlan);
+            this.groupBox6.Controls.Add(this.label10);
+            this.groupBox6.Location = new System.Drawing.Point(466, 235);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(428, 136);
+            this.groupBox6.TabIndex = 16;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "WDS";
+            // 
+            // comboWDSVlan
+            // 
+            this.comboWDSVlan.FormattingEnabled = true;
+            this.comboWDSVlan.Location = new System.Drawing.Point(197, 38);
+            this.comboWDSVlan.Name = "comboWDSVlan";
+            this.comboWDSVlan.Size = new System.Drawing.Size(215, 21);
+            this.comboWDSVlan.TabIndex = 14;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(50, 38);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(90, 13);
+            this.label10.TabIndex = 15;
+            this.label10.Text = "Betankungs vlan:";
+            // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.checkBox2);
             this.groupBox5.Controls.Add(this.comboAnsibleRemote);
             this.groupBox5.Controls.Add(this.txtAnsibleLocal);
             this.groupBox5.Controls.Add(this.label25);
             this.groupBox5.Controls.Add(this.label24);
-            this.groupBox5.Location = new System.Drawing.Point(18, 232);
+            this.groupBox5.Location = new System.Drawing.Point(18, 235);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(428, 107);
+            this.groupBox5.Size = new System.Drawing.Size(428, 136);
             this.groupBox5.TabIndex = 15;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Ansible";
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(197, 91);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(149, 17);
+            this.checkBox2.TabIndex = 15;
+            this.checkBox2.Text = "nach Deployment löschen";
+            this.checkBox2.UseVisualStyleBackColor = true;
             // 
             // comboAnsibleRemote
             // 
@@ -667,6 +677,12 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label5);
+            this.groupBox2.Controls.Add(this.txtCPU);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.txtHDD);
+            this.groupBox2.Controls.Add(this.label2);
+            this.groupBox2.Controls.Add(this.txtRAM);
             this.groupBox2.Controls.Add(this.label17);
             this.groupBox2.Controls.Add(this.txtName);
             this.groupBox2.Controls.Add(this.listBoxOS);
@@ -674,31 +690,70 @@
             this.groupBox2.Controls.Add(this.btn_clear);
             this.groupBox2.Controls.Add(this.label15);
             this.groupBox2.Controls.Add(this.txtDomain);
-            this.groupBox2.Controls.Add(this.comboVLAN);
             this.groupBox2.Controls.Add(this.btn_delete);
-            this.groupBox2.Controls.Add(this.label13);
-            this.groupBox2.Controls.Add(this.label11);
-            this.groupBox2.Controls.Add(this.txtDNS2);
-            this.groupBox2.Controls.Add(this.txtDNS1);
-            this.groupBox2.Controls.Add(this.label10);
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.txtGateway);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.listBoxPackages);
-            this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.btn_add);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.btn_edit);
-            this.groupBox2.Controls.Add(this.txtSubnet);
-            this.groupBox2.Controls.Add(this.txtIP);
             this.groupBox2.Controls.Add(this.txtHostname);
-            this.groupBox2.Location = new System.Drawing.Point(1141, 32);
+            this.groupBox2.Location = new System.Drawing.Point(1110, 6);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(363, 640);
+            this.groupBox2.Size = new System.Drawing.Size(363, 615);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Virtual Machine";
+            this.groupBox2.Text = "VM anlegen";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(44, 167);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(43, 13);
+            this.label5.TabIndex = 33;
+            this.label5.Text = "vCPUs:";
+            // 
+            // txtCPU
+            // 
+            this.txtCPU.Location = new System.Drawing.Point(131, 164);
+            this.txtCPU.Name = "txtCPU";
+            this.txtCPU.Size = new System.Drawing.Size(215, 20);
+            this.txtCPU.TabIndex = 32;
+            this.txtCPU.Text = "2";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(44, 141);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "HDD (GB):";
+            // 
+            // txtHDD
+            // 
+            this.txtHDD.Location = new System.Drawing.Point(131, 138);
+            this.txtHDD.Name = "txtHDD";
+            this.txtHDD.Size = new System.Drawing.Size(215, 20);
+            this.txtHDD.TabIndex = 30;
+            this.txtHDD.Text = "40";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(44, 115);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(59, 13);
+            this.label2.TabIndex = 29;
+            this.label2.Text = "RAM (MB):";
+            // 
+            // txtRAM
+            // 
+            this.txtRAM.Location = new System.Drawing.Point(131, 112);
+            this.txtRAM.Name = "txtRAM";
+            this.txtRAM.Size = new System.Drawing.Size(215, 20);
+            this.txtRAM.TabIndex = 28;
+            this.txtRAM.Text = "8192";
             // 
             // label17
             // 
@@ -724,7 +779,7 @@
             "Windows Server 2019 Standard",
             "Windows Server 2019 Core mit APLw",
             "Windows Server 2019 Standard mit APLw"});
-            this.listBoxOS.Location = new System.Drawing.Point(131, 265);
+            this.listBoxOS.Location = new System.Drawing.Point(131, 190);
             this.listBoxOS.Name = "listBoxOS";
             this.listBoxOS.Size = new System.Drawing.Size(215, 21);
             this.listBoxOS.TabIndex = 9;
@@ -732,7 +787,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(44, 265);
+            this.label18.Location = new System.Drawing.Point(44, 190);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(80, 13);
             this.label18.TabIndex = 25;
@@ -741,7 +796,7 @@
             // btn_clear
             // 
             this.btn_clear.Enabled = false;
-            this.btn_clear.Location = new System.Drawing.Point(27, 607);
+            this.btn_clear.Location = new System.Drawing.Point(27, 586);
             this.btn_clear.Name = "btn_clear";
             this.btn_clear.Size = new System.Drawing.Size(75, 23);
             this.btn_clear.TabIndex = 14;
@@ -752,7 +807,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(44, 215);
+            this.label15.Location = new System.Drawing.Point(44, 89);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(46, 13);
             this.label15.TabIndex = 23;
@@ -760,23 +815,15 @@
             // 
             // txtDomain
             // 
-            this.txtDomain.Location = new System.Drawing.Point(131, 212);
+            this.txtDomain.Location = new System.Drawing.Point(131, 86);
             this.txtDomain.Name = "txtDomain";
             this.txtDomain.Size = new System.Drawing.Size(215, 20);
             this.txtDomain.TabIndex = 7;
             // 
-            // comboVLAN
-            // 
-            this.comboVLAN.FormattingEnabled = true;
-            this.comboVLAN.Location = new System.Drawing.Point(131, 238);
-            this.comboVLAN.Name = "comboVLAN";
-            this.comboVLAN.Size = new System.Drawing.Size(215, 21);
-            this.comboVLAN.TabIndex = 8;
-            // 
             // btn_delete
             // 
             this.btn_delete.Enabled = false;
-            this.btn_delete.Location = new System.Drawing.Point(108, 607);
+            this.btn_delete.Location = new System.Drawing.Point(108, 586);
             this.btn_delete.Name = "btn_delete";
             this.btn_delete.Size = new System.Drawing.Size(75, 23);
             this.btn_delete.TabIndex = 13;
@@ -784,76 +831,10 @@
             this.btn_delete.UseVisualStyleBackColor = true;
             this.btn_delete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(44, 241);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(38, 13);
-            this.label13.TabIndex = 19;
-            this.label13.Text = "VLAN:";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(44, 189);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(42, 13);
-            this.label11.TabIndex = 17;
-            this.label11.Text = "DNS 2:";
-            // 
-            // txtDNS2
-            // 
-            this.txtDNS2.Location = new System.Drawing.Point(131, 186);
-            this.txtDNS2.Name = "txtDNS2";
-            this.txtDNS2.Size = new System.Drawing.Size(215, 20);
-            this.txtDNS2.TabIndex = 6;
-            // 
-            // txtDNS1
-            // 
-            this.txtDNS1.Location = new System.Drawing.Point(131, 160);
-            this.txtDNS1.Name = "txtDNS1";
-            this.txtDNS1.Size = new System.Drawing.Size(215, 20);
-            this.txtDNS1.TabIndex = 5;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(44, 163);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(42, 13);
-            this.label10.TabIndex = 14;
-            this.label10.Text = "DNS 1:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(44, 137);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(52, 13);
-            this.label5.TabIndex = 13;
-            this.label5.Text = "Gateway:";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(44, 111);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(80, 13);
-            this.label3.TabIndex = 12;
-            this.label3.Text = "Subnetzmaske:";
-            // 
-            // txtGateway
-            // 
-            this.txtGateway.Location = new System.Drawing.Point(131, 134);
-            this.txtGateway.Name = "txtGateway";
-            this.txtGateway.Size = new System.Drawing.Size(215, 20);
-            this.txtGateway.TabIndex = 4;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(44, 294);
+            this.label4.Location = new System.Drawing.Point(44, 217);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(58, 13);
             this.label4.TabIndex = 10;
@@ -862,24 +843,15 @@
             // listBoxPackages
             // 
             this.listBoxPackages.FormattingEnabled = true;
-            this.listBoxPackages.Location = new System.Drawing.Point(131, 294);
+            this.listBoxPackages.Location = new System.Drawing.Point(131, 217);
             this.listBoxPackages.Name = "listBoxPackages";
             this.listBoxPackages.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
-            this.listBoxPackages.Size = new System.Drawing.Size(215, 303);
+            this.listBoxPackages.Size = new System.Drawing.Size(215, 355);
             this.listBoxPackages.TabIndex = 10;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(44, 89);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(20, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "IP:";
             // 
             // btn_add
             // 
-            this.btn_add.Location = new System.Drawing.Point(189, 607);
+            this.btn_add.Location = new System.Drawing.Point(189, 586);
             this.btn_add.Name = "btn_add";
             this.btn_add.Size = new System.Drawing.Size(75, 23);
             this.btn_add.TabIndex = 11;
@@ -899,27 +871,13 @@
             // btn_edit
             // 
             this.btn_edit.Enabled = false;
-            this.btn_edit.Location = new System.Drawing.Point(271, 607);
+            this.btn_edit.Location = new System.Drawing.Point(271, 586);
             this.btn_edit.Name = "btn_edit";
             this.btn_edit.Size = new System.Drawing.Size(75, 23);
             this.btn_edit.TabIndex = 12;
             this.btn_edit.Text = "Bearbeiten";
             this.btn_edit.UseVisualStyleBackColor = true;
             this.btn_edit.Click += new System.EventHandler(this.btnEditClick);
-            // 
-            // txtSubnet
-            // 
-            this.txtSubnet.Location = new System.Drawing.Point(131, 108);
-            this.txtSubnet.Name = "txtSubnet";
-            this.txtSubnet.Size = new System.Drawing.Size(215, 20);
-            this.txtSubnet.TabIndex = 3;
-            // 
-            // txtIP
-            // 
-            this.txtIP.Location = new System.Drawing.Point(131, 82);
-            this.txtIP.Name = "txtIP";
-            this.txtIP.Size = new System.Drawing.Size(215, 20);
-            this.txtIP.TabIndex = 2;
             // 
             // txtHostname
             // 
@@ -942,6 +900,8 @@
             this.tabControl2.ResumeLayout(false);
             this.Liste.ResumeLayout(false);
             this.Umgebung.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
@@ -959,14 +919,11 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtSubnet;
-        private System.Windows.Forms.TextBox txtIP;
         private System.Windows.Forms.TextBox txtHostname;
         private System.Windows.Forms.Button btn_edit;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ListBox listBoxPackages;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label lbl_hypervisor;
         private System.Windows.Forms.Label label6;
@@ -976,19 +933,9 @@
         private System.Windows.Forms.TextBox txt_hv_loginpassword;
         private System.Windows.Forms.TextBox txt_hv_loginname;
         private System.Windows.Forms.TextBox txt_hv_ip;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.TextBox txtDNS2;
-        private System.Windows.Forms.TextBox txtDNS1;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox txtGateway;
-        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label txtStatus;
         private System.Windows.Forms.ColumnHeader Hostname;
         private System.Windows.Forms.ColumnHeader IP;
-        private System.Windows.Forms.ColumnHeader Subnet;
-        private System.Windows.Forms.ColumnHeader DNS1;
-        private System.Windows.Forms.ColumnHeader DNS2;
         private System.Windows.Forms.ColumnHeader Domain;
         private System.Windows.Forms.ColumnHeader Packages;
         private System.Windows.Forms.TabControl tabControl2;
@@ -997,19 +944,15 @@
         private System.Windows.Forms.ComboBox comboHypervisor;
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.ColumnHeader Status;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Button saveVMsinMission;
         private System.Windows.Forms.Button btn_delete;
-        private System.Windows.Forms.ComboBox comboVLAN;
-        private System.Windows.Forms.ColumnHeader Gateway;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox txtDomain;
         private System.Windows.Forms.Button btn_clear;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button1;
         internal System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.ColumnHeader VLAN;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.ComboBox listBoxOS;
         private System.Windows.Forms.Label label18;
@@ -1041,6 +984,16 @@
         private System.Windows.Forms.ComboBox comboAnsibleRemote;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtCPU;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtHDD;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtRAM;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.ComboBox comboWDSVlan;
+        private System.Windows.Forms.Label label10;
     }
 }
 

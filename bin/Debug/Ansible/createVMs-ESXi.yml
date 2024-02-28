@@ -1,0 +1,168 @@
+---
+- name: Erstellen von VMs auf einem ESXi-Host
+  hosts: localhost
+  vars_files:
+    - ./serverlist.yml
+  vars:
+    esxi_hostname: "{ansible_esxiip}"
+    esxi_username: "{ansible_username}"
+    esxi_password: "{ansible_password}"  
+    ansible_username: "{ansible_username}"
+
+  tasks:
+    - name: VMs erstellen basierend auf der Konfigurationsdatei
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
+        username: "{{ esxi_configuration[0].esxi_username }}"
+        password: "{{ esxi_configuration[0].esxi_password }}"
+        validate_certs: no
+        name: "{{ vm.vm_name }}"
+        state: present
+        folder: "/"
+        guest_id: "{{ vm.guest_id }}"
+        datacenter: "{{ vm.datacenter_name }}"
+        datastore: "{{ vm.datastore_name }}"
+        disk:
+          - size_gb: "{{ vm.disk_size }}"
+            type: thin
+            datastore: "{{ vm.datastore_name }}"
+        hardware:
+          memory_mb: "{{ vm.memory }}"
+          num_cpus: "{{ vm.vcpus }}"
+          scsi: lsilogicsas
+          secure_boot: true
+          boot_firmware: "efi"
+        networks:
+          - name: "SIDS_SRV_6_Data"
+            device_type: e1000e
+          - name: "{{ vm.network }}"
+            device_type: vmxnet3
+            start_connected: true
+      delegate_to: localhost
+      loop: "{{ vm_configurations }}"
+      loop_control:
+        loop_var: vm
+      when: esxi_configuration | length > 0
+      register: vm_creation_results
+
+    - name: Setze das Hinweisfeld der VM mit Erstellungsdatum, User, Installation und Rollen
+      ignore_errors: true
+      community.vmware.vmware_guest:
+        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
+        username: "{{ esxi_configuration[0].esxi_username }}"
+        password: "{{ esxi_configuration[0].esxi_password }}"
+        validate_certs: no
+        name: "{{ vm.vm_name }}"
+        datacenter: "{{ vm.datacenter_name }}"
+        folder: "/{{ vm.datacenter_name }}/vm"  # Passen Sie diesen Pfad an Ihren Ordnerpfad an
+        annotation: |-
+          Erstellt durch Ansible-Playbook am:
+          {{ ansible_date_time.date }} {{ ansible_date_time.time }}
+
+          Ersteller: {{ ansible_env.USER }}
+          Installation: {{ vm.deployment }}
+          Rollen: {{ vm.role }}
+          Domain: {{ vm.domain }}
+          IP: {{ vm.ip }}
+          VLAN: {{ vm.network }}
+        state: present
+      delegate_to: localhost
+      loop: "{{ vm_configurations }}"
+      loop_control:
+        loop_var: vm
+      when: vm_creation_results.changed
+
+
+    - name: Pause for 20 secounds to build app cache
+      ansible.builtin.pause:
+        seconds: 20
+
+    - name: Hole Informationen der erstellten VMs und zeige MAC-Adressen
+      community.vmware.vmware_guest_info:
+        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
+        username: "{{ esxi_configuration[0].esxi_username }}"
+        password: "{{ esxi_configuration[0].esxi_password }}"
+        validate_certs: no
+        datacenter: "{{ vm.datacenter_name }}"
+        name: "{{ vm.vm_name }}"
+      delegate_to: localhost
+      register: vm_info
+      loop: "{{ vm_configurations }}"
+      loop_control:
+        loop_var: vm
+      when: esxi_configuration | length > 0
+
+
+    - name: Sammle Hostnamen und MAC-Adressen für die Datei
+      set_fact:
+        vm_lines: "{{ vm_lines | default([]) + [ item.instance.hw_name + ';' + item.instance.hw_eth0.macaddress ] }}"
+      loop: "{{ vm_info.results }}"
+      when: item.instance.hw_eth0.macaddress is defined
+
+    - name: Speichere Hostnamen und MAC-Adressen in eine Datei
+      copy:
+        dest: "./computer-src/server-mac-list.csv"
+        content: "{{ vm_lines | join('\n') }}"
+        owner: {{ ansible_username }}
+        group: {{ ansible_username }}
+        mode: '0644'
+
+
+     ## Konvertiere YAML zu CSV für SQL Import 
+
+    - name: Lade serverlist.yml
+      ansible.builtin.include_vars:
+        file: ./computer-src/serverlist.yml
+        name: vm_data
+
+    - name: Erstelle aus serverlist.yml (Rollenliste) eine lesbare CSV 
+      ansible.builtin.template:
+        src: "./computer-src/yaml_to_csv.j2"
+        dest: "./computer-src/serverlist.csv"
+      vars:
+        vm_configurations: "{{ vm_data.vm_configurations }}"
+
+    ## Importiere CSV in SQL
+
+    - name: Führe Python-Skript aus, um Daten aus CSV in MySQL zu schreiben
+      ansible.builtin.command: python3 ./computer-src/insert_csv_to_mysql.py
+
+    ## Veröffentlichung auf Webserver (Dateien kopieren nach WEB)
+
+    - name: Veröffentliche Serverliste mit Rollen
+      ansible.builtin.copy:
+        dest: "/srv/docker-data/web/serverlist.csv"
+        src: "./computer-src/serverlist.csv"
+        owner: {{ ansible_username }}
+        group: {{ ansible_username }}
+        mode: '0644'
+
+    - name: Veröffentliche Serverliste mit MAC-Adressen
+      ansible.builtin.copy:
+        dest: "/srv/docker-data/web/serverlist.csv"
+        src: "./computer-src/server-mac-list.csv"
+        owner: {{ ansible_username }}
+        group: {{ ansible_username }}
+        mode: '0644'
+
+
+    - name: Pause for 5 minutes to build app cache
+      ansible.builtin.pause:
+        minutes: 5
+
+    - name: Starte VM
+      ignore_errors: true
+      community.vmware.vmware_guest_powerstate:
+        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
+        username: "{{ esxi_configuration[0].esxi_username }}"
+        password: "{{ esxi_configuration[0].esxi_password }}"
+        validate_certs: no
+        name: "{{ vm.vm_name }}"
+        state: powered-on
+        datacenter: "{{ vm.datacenter_name }}"
+      delegate_to: localhost
+      loop: "{{ vm_configurations }}"
+      loop_control:
+        loop_var: vm
+      when: esxi_configuration | length > 0
+

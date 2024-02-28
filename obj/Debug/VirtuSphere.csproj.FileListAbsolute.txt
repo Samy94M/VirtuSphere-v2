@@ -31,3 +31,6 @@ C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.exe.ma
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\VirtuSphere.application
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.exe.manifest
 C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.application
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.AnsibleForm.resources
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\bin\Debug\Ansible\createVMs-ESXi.yml
+C:\Users\dario\source\repos\VirtuSphere\VirtuSphere\obj\Debug\VirtuSphere.vmeditForm.resources

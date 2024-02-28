@@ -78,7 +78,7 @@ namespace VirtuSphere
             }
             return null; // Bei Fehlschlag
         }
-        public async Task<List<PackageItem>> GetPackages(string hostname, string token)
+        public async Task<List<Package>> GetPackages(string hostname, string token)
         {
             string requestUri = $"http://{hostname}/access.php?action=getPackages&token={token}";
             var response = await _httpClient.GetAsync(requestUri);
@@ -94,7 +94,7 @@ namespace VirtuSphere
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var packageList = JsonConvert.DeserializeObject<List<PackageItem>>(responseContent);
+                var packageList = JsonConvert.DeserializeObject<List<Package>>(responseContent);
                 return packageList;
             }
             return null; // Bei Fehlschlag oder "Access Forbidden"
@@ -258,13 +258,20 @@ namespace VirtuSphere
         }
         public async Task<List<VM>> GetVMs(string hostname, string token, int missionId)
         {
+            Console.WriteLine("----------------------");
+            Console.WriteLine("Aktion GetVMs für VM-Liste wird durchgeführt");
             string requestUri = $"http://{hostname}/access.php?action=getVMs&token={token}&missionId={missionId}";
             var response = await _httpClient.GetAsync(requestUri);
+
+            Console.WriteLine($"RequestUri: {requestUri}");
+            Console.WriteLine($"Request: {response}");
+            Console.WriteLine($"Status Code:{response.StatusCode}");
 
             if ((int)response.StatusCode == 418)
             {
                 Console.WriteLine("Token abgelaufen");
                 MessageBox.Show("Token abgelaufen");
+                Console.WriteLine("----------------------");
                 return null; // Beachte, dass du vielleicht eine leere Liste zurückgeben möchtest statt null, um NullReferenceExceptions zu vermeiden.
             }
 
@@ -272,9 +279,24 @@ namespace VirtuSphere
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 // Direkt deserialisieren zu List<VM> statt zu List<string>
-                var vmList = JsonConvert.DeserializeObject<List<VM>>(responseContent);
-                return vmList; // Diese Liste enthält VM-Objekte, nicht nur VM-Namen
+                try
+                {
+                    var vmList = JsonConvert.DeserializeObject<List<VM>>(responseContent);
+                    Console.WriteLine("Response Content: " + responseContent);
+                    Console.WriteLine("----------------------");
+                    return vmList; // Diese Liste enthält VM-Objekte, nicht nur VM-Namen
+                }
+                catch (JsonException)
+                {
+                    MessageBox.Show("Ungültiges JSON: " + responseContent);
+                    // responseContent in console
+                    Console.WriteLine("Response Content: " + responseContent);
+                    Console.WriteLine("----------------------");
+                    return null;
+                }
+                
             }
+            Console.WriteLine("----------------------");
             return null; // Bei Fehlschlag oder "Access Forbidden"
         }
         public async Task<bool> SendVMList(string hostname, string token, int missionId, List<VM> vmList)
@@ -465,15 +487,7 @@ namespace VirtuSphere
         }
 
 
-        public class Package
-        {
-            public string id { get; set; }
-            public string package_name { get; set; }
-            public string package_version { get; set; }
-            public string package_status { get; set; }
-            public string created_at { get; set; }
-            public string updated_at { get; set; }
-        }
+
 
         public class Missions
         {
@@ -490,20 +504,75 @@ namespace VirtuSphere
             public int mission_id { get; set; }
             public string vm_name { get; set; }
             public string vm_hostname { get; set; }
-            public string vm_ip { get; set; }
-            public string vm_subnet { get; set; }
-            public string vm_gateway { get; set; }
-            public string vm_dns1 { get; set; }
-            public string vm_dns2 { get; set; }      
             public string vm_domain { get; set; }
-            public string vm_vlan { get; set; }
-            public string vm_role { get; set; }
-            public string vm_packages { get; set; }
+            public string vm_os { get; set; } // Betriebssystem is German for Operating System
+            public string vm_ram { get; set; }
+            public string vm_disk { get; set; }
+            public string vm_cpu { get; set; }
+            public string vm_datastore { get; set; }
+            public string vm_datacenter { get; set; }
+            public string vm_guest_id { get; set; } // Assuming this is a unique ID for the VM guest
+            public string vm_creator { get; set; } // Ersteller is German for Creator
             public string vm_status { get; set; }
-            public string vm_os { get; set; }
-            public int os_id { get; set; }
+            public string created_at { get; set; } // Erstellt am is German for Created on
+            public string updated_at { get; set; } // Modifiziert am is German for Modified on
+            public string vm_notes { get; set; } // Notizen is German for Notes
 
-            
+            public List<Interface> interfaces { get; set; }
+            public List<Package> packages { get; set; }
+
+            public VM()
+            {
+                interfaces = new List<Interface>();
+                packages = new List<Package>();
+            }
+        }
+
+        public class Package
+        {
+            public string id { get; set; }
+            public string package_name { get; set; }
+            public string package_version { get; set; }
+            public string package_status { get; set; }
+
+        }
+
+        public class PackageItem
+        {
+            public string id { get; set; }
+            public string package_name { get; set; }
+            public string package_version { get; set; }
+            public string package_status { get; set; }
+        }
+
+        public class Interface
+        {
+            public int id { get; set; }
+            public int vm_id { get; set; }
+
+            public string ip { get; set; }
+            public string subnet { get; set; }
+            public string gateway { get; set; }
+            public string dns1 { get; set; }
+            public string dns2 { get; set; }
+            public string vlan { get; set; }
+            public string mac { get; set; }
+            public string mode { get; set; }
+
+            public string DisplayText
+            {
+                get
+                {
+                    if (mode == "DHCP")
+                    {
+                        return $"Mode: {mode}, VLAN: {vlan}";
+                    }
+                    else // Für "Static" oder andere Modi
+                    {
+                        return $"IP: {ip}, Mode: {mode}, VLAN: {vlan}";
+                    }
+                }
+            }
         }
 
 

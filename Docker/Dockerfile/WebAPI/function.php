@@ -26,59 +26,6 @@ function removeLog($connection){
 
 
 
-// Create tables if they don't exist
-$createUsersTable = "CREATE TABLE IF NOT EXISTS deploy_users (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   name VARCHAR(255) NOT NULL,
-   password VARCHAR(255) NOT NULL,
-   email VARCHAR(255) NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)";
-
-$createVmsTable = "CREATE TABLE IF NOT EXISTS deploy_vms (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   vm_name VARCHAR(255) NOT NULL,
-   vm_hostname VARCHAR(255) NOT NULL,
-   vm_ip VARCHAR(255) NOT NULL,
-   vm_subnet VARCHAR(255) NOT NULL,
-   vm_gateway VARCHAR(255) NOT NULL,
-   vm_dns1 VARCHAR(255) NOT NULL,
-   vm_dns2 VARCHAR(255) NOT NULL,
-   vm_domain VARCHAR(255) NOT NULL,
-   vm_vlan VARCHAR(255) NOT NULL,
-   vm_role VARCHAR(255) NOT NULL,
-   vm_status VARCHAR(255) NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)";
-
-$createPackagesTable = "CREATE TABLE IF NOT EXISTS deploy_packages (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   package_name VARCHAR(255) NOT NULL,
-   package_version VARCHAR(255) NOT NULL,
-   package_status VARCHAR(255) NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)";
-
-$createLogsTable = "CREATE TABLE IF NOT EXISTS deploy_logs (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   ip VARCHAR(255) NOT NULL,
-   log_message TEXT NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)";
-
-# erstelle $createTokensTable
-$createTokensTable = "CREATE TABLE IF NOT EXISTS deploy_tokens (
-   id INT AUTO_INCREMENT PRIMARY KEY,
-   token VARCHAR(255) NOT NULL,
-   expired BOOLEAN NOT NULL,
-   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)";
-
 function generateToken($username, $password, $connection) {
    // Check if login credentials are correct with password_verify
       $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -172,7 +119,7 @@ function getMissions($connection) {
    return $missions;
 }
 
-function getVMs($connection, $missionId) {
+function getVMs_2($connection, $missionId) {
    $query = "SELECT * FROM deploy_vms where mission_id = $missionId";
    $result = $connection->query($query);
    if (!$result) {
@@ -186,6 +133,59 @@ function getVMs($connection, $missionId) {
    
    return $vms;
 }
+
+function getVMs($connection, $missionId) {
+   // Zuerst die VMs für die gegebene mission_id abrufen
+   $vmQuery = "SELECT * FROM deploy_vms WHERE mission_id = ?";
+   $stmt = $connection->prepare($vmQuery);
+   $stmt->bind_param("i", $missionId);
+   $stmt->execute();
+   $result = $stmt->get_result();
+   if (!$result) {
+       die('Error: ' . $connection->error);
+   }
+   
+   $vms = array();
+   while ($row = $result->fetch_assoc()) {
+       // Für jede VM die zugehörigen Pakete abrufen
+       $vmId = $row['id'];
+       $packagesQuery = "SELECT dp.* FROM deploy_packages dp 
+                         INNER JOIN deploy_vm_packages dvp ON dp.id = dvp.package_id 
+                         WHERE dvp.vm_id = ?";
+       $packageStmt = $connection->prepare($packagesQuery);
+       $packageStmt->bind_param("i", $vmId);
+       $packageStmt->execute();
+       $packagesResult = $packageStmt->get_result();
+       
+       $packages = array();
+       while ($packageRow = $packagesResult->fetch_assoc()) {
+           $packages[] = $packageRow;
+       }
+       
+       // Die Pakete zum VM-Array hinzufügen
+       $row['packages'] = $packages;
+
+      // Für jede VM die zugehörigen Netzwerk-Interfaces abrufen
+      $interfacesQuery = "SELECT * FROM deploy_interfaces WHERE vm_id = ?";
+      $interfaceStmt = $connection->prepare($interfacesQuery);
+      $interfaceStmt->bind_param("i", $vmId);
+      $interfaceStmt->execute();
+      $interfacesResult = $interfaceStmt->get_result();
+
+       $interfaces = array();
+       while ($interfaceRow = $interfacesResult->fetch_assoc()) {
+           $interfaces[] = $interfaceRow;
+       }
+       
+       // Die Interfaces zum VM-Array hinzufügen
+       $row['interfaces'] = $interfaces;
+
+       $vms[] = $row;
+   }
+   
+   return $vms;
+}
+
 
 function getPackages($connection) {
    $query = "SELECT * FROM deploy_packages";
@@ -278,8 +278,119 @@ function deleteVM($vmList, $connection){
    }
 }
 
+function vmListToCreate($missionId, $vmList, $mysqli){
+   if (!empty($vmList)) {
+      $successCount = 0;
+      foreach ($vmList as $vm) {
+         // Angenommen, $vm repräsentiert das VM-Objekt, das Sie einfügen möchten, und $mysqli ist Ihre Datenbankverbindung
+         //$missionId = $vm->mission_id; // Stellen Sie sicher, dass diese Eigenschaft existiert und korrekt gesetzt ist
+         $vmStatus = ''; // Beispielstatus, passen Sie dies entsprechend an
 
-function vmListToCreate($missionId, $vmList, $connection){
+         // VM in die deploy_vms Tabelle einfügen
+         $query = "INSERT INTO deploy_vms (mission_id, vm_name, vm_hostname, vm_domain, vm_os, vm_status, vm_notes) VALUES ('{$missionId}', '{$vm->vm_name}', '{$vm->vm_hostname}', '{$vm->vm_domain}', '{$vm->vm_os}', '{$vmStatus}', '{$vm->vm_notes}')";
+
+         if ($mysqli->query($query) === TRUE) {
+            $vmId = $mysqli->insert_id; // ID der gerade eingefügten VM
+            $successCount++;
+
+            // Jetzt können Sie die Interfaces und Pakete der VM einfügen
+            // Für jedes Interface in $vm->vm_interfaces
+            foreach ($vm->interfaces as $interface) {
+               // Stellen Sie sicher, dass die notwendigen Interface-Daten vorhanden sind
+               $query = "INSERT INTO deploy_interfaces (vm_id, ip, subnet, gateway, dns1, dns2, vlan, mac) VALUES ('{$vmId}', '{$interface->ip}', '{$interface->subnet}', '{$interface->gateway}', '{$interface->dns1}', '{$interface->dns2}', '{$interface->vlan}', '{$interface->mac}')";
+               $mysqli->query($query);
+               // Prüfen Sie hier auf Fehler mit $mysqli->error und behandeln Sie diese entsprechend
+            }
+
+            // Für jedes Paket in $vm->vm_packages
+            foreach ($vm->packages as $package) {
+               // Stellen Sie sicher, dass die notwendigen Paketdaten vorhanden sind
+               $query = "INSERT INTO deploy_packages (vm_id, package_name, package_version, package_status) VALUES ('{$vmId}', '{$package->package_name}', '{$package->package_version}', '{$package->package_status}')";
+               $mysqli->query($query);
+               // Prüfen Sie hier auf Fehler mit $mysqli->error und behandeln Sie diese entsprechend
+            }
+         } else {
+            // Fehlerbehandlung, wenn das Einfügen der VM fehlschlägt
+            file_put_contents('fail.log', json_encode($vmList));
+            file_put_contents('fail.log', $query);
+            file_put_contents('fail.log', $mysqli->error);
+            echo "Error: " . $query . "<br>" . $mysqli->error;
+         }
+      }
+      return $successCount;
+   }else { return 0; }
+}
+
+function vmListToUpdate($vmList, $connection) {
+   $successCount = 0;
+   foreach ($vmList as $vm) {
+       if (isset($vm->Id)) {
+           $query = "UPDATE deploy_vms SET mission_id = ?, vm_name = ?, vm_hostname = ?, vm_domain = ?, vm_os = ?, vm_status = ?, vm_notes = ? WHERE id = ?";
+           if ($stmt = $connection->prepare($query)) {
+               $stmt->bind_param("issssssi", $vm->mission_id, $vm->vm_name, $vm->vm_hostname, $vm->vm_domain, $vm->vm_os, $vm->vm_status, $vm->vm_notes, $vm->Id);
+               if (!$stmt->execute()) {
+                   file_put_contents('fail.log', "Fehler beim Aktualisieren der VM mit ID " . $vm->Id . ": " . $stmt->error, FILE_APPEND);
+                   echo "Fehler beim Aktualisieren der VM mit ID " . $vm->Id . ": " . $stmt->error;
+               } else {
+                   $successCount++;
+                    
+                   // Lösche vorhandene Interfaces der VM
+                    $deleteInterfacesQuery = "DELETE FROM deploy_interfaces WHERE vm_id = ?";
+                    if ($deleteInterfacesStmt = $connection->prepare($deleteInterfacesQuery)) {
+                        $deleteInterfacesStmt->bind_param("i", $vm->Id);
+                        $deleteInterfacesStmt->execute();
+                        $deleteInterfacesStmt->close();
+                    }
+
+                    // Füge neue Interfaces ein
+                    $insertInterfaceQuery = "INSERT INTO deploy_interfaces (vm_id, ip, subnet, gateway, dns1, dns2, vlan, mac) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    foreach ($vm->interfaces as $interface) {
+                        if ($insertInterfaceStmt = $connection->prepare($insertInterfaceQuery)) {
+                            $insertInterfaceStmt->bind_param("isssssss", $vm->Id, $interface->ip, $interface->subnet, $interface->gateway, $interface->dns1, $interface->dns2, $interface->vlan, $interface->mac);
+                            if (!$insertInterfaceStmt->execute()) {
+                                file_put_contents('fail.log', "Fehler beim Einfügen des Interfaces für VM mit ID " . $vm->Id . ": " . $insertInterfaceStmt->error, FILE_APPEND);
+                            }
+                            $insertInterfaceStmt->close();
+                        }
+                    }
+
+
+                   // Pakete aktualisieren
+                   $deleteQuery = "DELETE FROM deploy_vm_packages WHERE vm_id = ?";
+                   if ($deleteStmt = $connection->prepare($deleteQuery)) {
+                       $deleteStmt->bind_param("i", $vm->Id);
+                       $deleteStmt->execute(); // Vorhandene Zuordnungen löschen
+                       $deleteStmt->close();
+
+                       // Neue Paketzuordnungen einfügen
+                       $insertQuery = "INSERT INTO deploy_vm_packages (vm_id, package_id) VALUES (?, ?)";
+                       foreach ($vm->packages as $package) {
+                           if ($insertStmt = $connection->prepare($insertQuery)) {
+                               $insertStmt->bind_param("ii", $vm->Id, $package->id);
+                               if (!$insertStmt->execute()) {
+                                   file_put_contents('fail.log', "Fehler beim Zuordnen des Pakets mit ID " . $package->id . " zur VM mit ID " . $vm->Id . ": " . $insertStmt->error, FILE_APPEND);
+                                   echo "Fehler beim Zuordnen des Pakets mit ID " . $package->id . " zur VM mit ID " . $vm->Id . ": " . $insertStmt->error;
+                               }
+                               $insertStmt->close();
+                           }
+                       }
+                   }
+               }
+               $stmt->close();
+           } else {
+               echo "Fehler beim Vorbereiten des Update-Statements: " . $connection->error;
+           }
+       } else {
+           file_put_contents('fail.log', json_encode($vm), FILE_APPEND);
+           echo "Nicht alle erforderlichen Daten für das Update sind vorhanden.";
+       }
+   }
+   return $successCount;
+}
+
+
+
+function vmListToCreate_old($missionId, $vmList, $connection){
    if (!empty($vmList)) {
       $successCount = 0;
       foreach ($vmList as $vm) {
@@ -288,18 +399,26 @@ function vmListToCreate($missionId, $vmList, $connection){
          if ($result) {
             $successCount++;
          } else {
+           
+            file_put_contents('fail.log', json_encode($vmList));
             die('Error: ' . $connection->error);
          }
       }
       return $successCount;
    } else {
       return 0;
+      // Speicher $vmList in Fail.log
+   // Speicher $vmList in Fail.log
+      // erstelle 
+
+   file_put_contents('fail.log', json_encode($vmList));
+      
    }
 }
       
 
 
-function vmListToUpdate($vmList, $connection){
+function vmListToUpdate_old($vmList, $connection){
    if (!empty($vmList)) {
       foreach ($vmList as $vm) {
          if($vm->Id != '' or $vm->Id != null){

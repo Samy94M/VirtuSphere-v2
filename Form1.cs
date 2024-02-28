@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,16 +23,18 @@ namespace VirtuSphere
     public partial class FMmain : Form
     {
 
+        public ApiService ApiService = new ApiService();
+
         public string hostname { get; set; }
         public string Token { get; set; }
         public int missionId { get; set; }
         public string missionName { get; set; }
-        public ApiService ApiService { get; set; }
         public List<VM> vms = new List<VM>();
         public List<VM> vmListToDelete = new List<VM>();
         public List<VM> vmListToCreate = new List<VM>();
         public List<VM> vmListToUpdate = new List<VM>();
         public List<MissionItem> missionItems = new List<MissionItem>();
+        public List<Package> packageItems = new List<Package>();
 
 
 
@@ -40,15 +43,15 @@ namespace VirtuSphere
         public FMmain()
         {
 
-
             InitializeComponent();
-
             DisableInputFields();
 
             string LocalUserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string LocalAnsiblePath = LocalUserProfile + "\\ansible-playbooks";
             txtAnsibleLocal.Text = LocalAnsiblePath;
             comboAnsibleRemote.SelectedIndex = 0;
+
+
 
         }
 
@@ -109,6 +112,21 @@ namespace VirtuSphere
                 }
             }
         }
+        // check status 
+        public void checkStatus()
+        {
+            if(vmListToCreate.Count == 0 && vmListToDelete.Count == 0 && vmListToUpdate.Count == 0)
+            {
+                
+                txtStatus.Text = "Status: OK";
+
+            }
+            else
+            {
+                txtStatus.Text = "Status: Datenbank update notwendig!";
+            }
+        }
+
         private void btnAddClick(object sender, EventArgs e)
         {
             string packages = "";
@@ -118,22 +136,37 @@ namespace VirtuSphere
                 Console.WriteLine("Selected Packages Item für: " + txtName.Text + " " + item.ToString());
             }
 
+
+
+            // ermittel das erste VLAN in der Liste
+            string erstesVLAN = comboWDSVlan.SelectedItem.ToString();
+
+            // erstelle Inteface und weise es vm zu
+            Interface newInterface = new Interface
+            {
+                ip = "",
+                subnet = "",
+                gateway = "",
+                dns1 = "",
+                dns2 = "",
+                vlan = erstesVLAN,
+                mode = "DHCP"
+            };
+
             // Create a new VM object with the entered values
             VM vm = new VM
             {
                 vm_name = txtName.Text,
                 vm_hostname = txtHostname.Text,
-                vm_ip = txtIP.Text,
-                vm_subnet = txtSubnet.Text,
-                vm_gateway = txtGateway.Text,
-                vm_dns1 = txtDNS1.Text,
-                vm_dns2 = txtDNS2.Text,
                 vm_domain = txtDomain.Text,
-                vm_vlan = comboVLAN.Text,
                 vm_os = listBoxOS.Text,
-                vm_packages = packages,
-                vm_status = "Neu - DB Sync!"
-
+                vm_status = "Neu - DB Sync!",
+                vm_cpu = txtCPU.Text,
+                vm_disk = txtHDD.Text,
+                vm_ram = txtRAM.Text,
+                created_at = "",
+                updated_at = "",
+                interfaces = new List<Interface> { newInterface }
             };
 
             if (ValidateInputFields(vm))
@@ -146,6 +179,8 @@ namespace VirtuSphere
                 ClearTextBoxes();
                 DisableButtons();
             }
+
+            checkStatus();
         }
 
         private bool ValidateInputFields(VM vm)
@@ -156,13 +191,7 @@ namespace VirtuSphere
                 return false;
             }
 
-            if (!IPAddress.TryParse(vm.vm_ip, out _) || !IPAddress.TryParse(vm.vm_subnet, out _) ||
-                !IPAddress.TryParse(vm.vm_gateway, out _) || !IPAddress.TryParse(vm.vm_dns1, out _) ||
-                !IPAddress.TryParse(vm.vm_dns2, out _))
-            {
-                MessageBox.Show("Eine oder mehrere IP-Adressen sind ungültig.");
-                return false;
-            }
+
 
             if (string.IsNullOrWhiteSpace(vm.vm_os))
             {
@@ -194,18 +223,41 @@ namespace VirtuSphere
             // Iterate through the vms list and add each VM to the listView1
             foreach (var vm in vms)
             {
+                string PackagesList = "";
+                string InterfaceList = "";
+
+
+                // prüfe ob vm.packages gefüllt ist und gebe die namen der Packages aus
+                if (vm.packages != null)
+                {
+                     foreach (var package in vm.packages)
+                     {
+                         Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
+                        PackagesList += package.package_name + "; ";
+                     }
+
+
+                    Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
+                }
+
+                if (vm.interfaces != null)
+                {
+                    foreach (var interface1 in vm.interfaces)
+                    {
+                        Console.WriteLine("Interface für " + vm.vm_name + ": " + interface1.ip);
+                        InterfaceList += interface1.ip + "; ";
+                    }
+
+                    Console.WriteLine("Interfaces für " + vm.vm_name + ": " + InterfaceList);
+                }
+
                 ListViewItem lvi = new ListViewItem(new[] {
                     vm.vm_name,
                     vm.vm_hostname,
-                    vm.vm_ip,
-                    vm.vm_subnet,
-                    vm.vm_gateway,
-                    vm.vm_dns1,
-                    vm.vm_dns2,
+                    InterfaceList,
                     vm.vm_domain,
-                    vm.vm_vlan,
                     vm.vm_os,
-                    vm.vm_role,
+                    PackagesList,
                     vm.vm_status
                 });
 
@@ -218,7 +270,7 @@ namespace VirtuSphere
             return Task.CompletedTask;
         }
 
-        private void btnEditClick(object sender, EventArgs e)
+        private async void btnEditClick(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count > 0)
             {
@@ -232,24 +284,18 @@ namespace VirtuSphere
                     // Bearbeite hier das Objekt in der Klasse vms
                     selectedVM.vm_name = txtName.Text;
                     selectedVM.vm_hostname = txtHostname.Text;
-                    selectedVM.vm_ip = txtIP.Text;
-                    selectedVM.vm_subnet = txtSubnet.Text;
-                    selectedVM.vm_gateway = txtGateway.Text;
-                    selectedVM.vm_dns1 = txtDNS1.Text;
-                    selectedVM.vm_dns2 = txtDNS2.Text;
                     selectedVM.vm_domain = txtDomain.Text;
-                    selectedVM.vm_vlan = comboVLAN.Text;
                     selectedVM.vm_os = listBoxOS.Text;
                     selectedVM.vm_status = "geändert - DB Sync!";
+                    selectedVM.vm_ram = txtRAM.Text;
+                    selectedVM.vm_disk = txtHDD.Text;
+                    selectedVM.vm_cpu = txtCPU.Text;
 
-                    // Ausgewählte listBoxPackages Objekte sollen mit Semikolon getrennt in vm_packages gespeichert werden
-                    string packages = "";
-                    foreach (var item in listBoxPackages.SelectedItems)
-                    {
-                        packages += item.ToString() + ";";
-                        Console.WriteLine("Selected Packages Item für: "+selectedVM.vm_name+" " + item.ToString());
-                    }
-                    selectedVM.vm_packages = packages;
+                    // Ausgewählte listBoxPackages Objekte sollen mit Semikolon getrennt in packages gespeichert werden
+
+                    //selectedVM.packages = packages;
+
+                    selectedVM.packages = await GetSelectedPackages(ApiService); // Warten auf das Task-Ergebnis
 
                     if (selectedVM.Id != 0)
                     {
@@ -266,6 +312,36 @@ namespace VirtuSphere
             }
 
         }
+
+        private async Task<List<Package>> GetSelectedPackages(ApiService apiService)
+        {
+
+            List<Package> selectedPackages = new List<Package>();
+            var allPackageItems = await apiService.GetPackages(hostname, Token); // Warten auf das Task-Ergebnis
+
+            if (allPackageItems != null) // Prüfen, ob das Ergebnis nicht null ist
+            {
+                foreach (var selectedItem in listBoxPackages.SelectedItems)
+                {
+                    // Annahme: 'selectedItem' ist der Name des Pakets, der in der ListBox angezeigt wird.
+                    var packageItem = allPackageItems.FirstOrDefault(p => p.package_name == selectedItem.ToString());
+                    if (packageItem != null)
+                    {
+                        Package package = new Package
+                        {
+                            id = packageItem.id,
+                            package_name = packageItem.package_name,
+                            package_version = packageItem.package_version,
+                            package_status = packageItem.package_status
+                        };
+                        selectedPackages.Add(package);
+                        Console.WriteLine("GetSelectedPackages Selected Package: " + package.package_name);
+                    }
+                }
+            }
+            return selectedPackages;
+        }
+
         void VMList_Click(object sender, EventArgs e)
         {
             // gib id aus
@@ -278,34 +354,19 @@ namespace VirtuSphere
                     //MessageBox.Show($"ID: {selectedVM.Id}\nName: {selectedVM.vm_name}\nIP: {selectedVM.vm_ip}\nOS: {selectedVM.vm_os}");
                     txtName.Text = selectedVM.vm_name;
                     txtHostname.Text = selectedVM.vm_hostname;
-                    txtIP.Text = selectedVM.vm_ip;
-                    txtSubnet.Text = selectedVM.vm_subnet;
-                    txtGateway.Text = selectedVM.vm_gateway;
-                    txtDNS1.Text = selectedVM.vm_dns1;
-                    txtDNS2.Text = selectedVM.vm_dns2;
                     txtDomain.Text = selectedVM.vm_domain;
-                    comboVLAN.Text = selectedVM.vm_vlan;
                     listBoxOS.Text = selectedVM.vm_os;
+                    txtRAM.Text = selectedVM.vm_ram;
+                    txtHDD.Text = selectedVM.vm_disk;
+                    txtCPU.Text = selectedVM.vm_cpu;
                     listBoxPackages.ClearSelected();
 
-                    // selectedVM.packages in listBoxPackages eintragen
-                    string[] packages = selectedVM.vm_packages.Split(';');
+                    MarkSelectedPackagesInListBox(selectedVM.packages);
 
-                    List<object> itemsToAdd = new List<object>();
-                    foreach (var item in listBoxPackages.Items)
-                    {
-                        if (packages.Contains(item.ToString()))
-                        {
-                            itemsToAdd.Add(item);
-                        }
-                    }
 
-                    foreach (var item in itemsToAdd)
-                    {
-                        listBoxPackages.SelectedItems.Add(item);
-                    }
 
-                        EnableButtons();
+                    EnableButtons();
+
                 }
                 else
                 {
@@ -325,6 +386,35 @@ namespace VirtuSphere
                 MessageBox.Show("Bitte wählen Sie eine VM aus.");
             }
         }
+
+        private void MarkSelectedPackagesInListBox(List<Package> selectedPackages)
+        {
+
+            // Sicherstellen, dass listBoxPackages2 nicht null ist
+            if (listBoxPackages == null || selectedPackages == null) return;
+
+            // Durchlaufen aller Items in listBoxPackages2
+            for (int i = 0; i < listBoxPackages.Items.Count; i++)
+            {
+
+                Console.WriteLine("2MarkSelectedPackagesInListBox is: " + listBoxPackages.Items[i]);
+                // Nehmen wir an, dass jedes Item in listBoxPackages2 eine Repräsentation eines Package-Objekts ist
+                // und dass es eine ToString-Überschreibung gibt, die package_name zurückgibt oder
+                // dass das Item direkt das Package-Objekt ist.
+                var item = listBoxPackages.Items[i];
+
+                // Überprüfen, ob das aktuelle Item in der Liste der ausgewählten Pakete vorhanden ist
+                bool isSelected = selectedPackages.Any(package =>
+                    package.package_name == item.ToString() || // Wenn die ListBox die Namen der Pakete direkt speichert
+                    (item is Package && ((Package)item).id == package.id)); // Wenn die ListBox Package-Objekte speichert
+
+                // Setzen der Selected-Eigenschaft basierend auf der Übereinstimmung
+                listBoxPackages.SetSelected(i, isSelected);
+
+                if (isSelected) { Console.Write(item.ToString() + " is selected"); }
+            }
+        }
+
         private void btnDelete_Click(object sender, EventArgs e)
         {
             // lösche das ausgewählte Item aus der ListView und macht die Textboxen leer
@@ -428,32 +518,26 @@ namespace VirtuSphere
         {
             txtName.Enabled = false;
             txtHostname.Enabled = false;
-            txtIP.Enabled = false;
-            txtSubnet.Enabled = false;
-            txtGateway.Enabled = false;
-            txtDNS1.Enabled = false;
-            txtDNS2.Enabled = false;
             txtDomain.Enabled = false;
-            comboVLAN.Enabled = false;
             listBoxOS.Enabled = false;
             listBoxPackages.Enabled = false;
             btn_add.Enabled = false;
+            txtCPU.Enabled = false;
+            txtHDD.Enabled = false;
+            txtRAM.Enabled = false;
         }
 
         public void EnableInputFields()
         {
             txtName.Enabled = true;
             txtHostname.Enabled = true;
-            txtIP.Enabled = true;
-            txtSubnet.Enabled = true;
-            txtGateway.Enabled = true;
-            txtDNS1.Enabled = true;
-            txtDNS2.Enabled = true;
             txtDomain.Enabled = true;
-            comboVLAN.Enabled = true;
             listBoxOS.Enabled = true;
             listBoxPackages.Enabled = true;
             btn_add.Enabled = true;
+            txtCPU.Enabled = true;
+            txtHDD.Enabled = true;
+            txtRAM.Enabled = true;
         }
 
         private void ExportToCSV()
@@ -524,19 +608,12 @@ namespace VirtuSphere
         {
             txtName.Text = "";
             txtHostname.Text = "";
-            txtIP.Text = "";
-            txtSubnet.Text = "";
-            txtGateway.Text = "";
-            txtDNS1.Text = "";
-            txtDNS2.Text = "";
             txtDomain.Text = "";
             listBoxPackages.SelectedItems.Clear();
             txtDomain.Text = "";
-            comboVLAN.Text = "";
-            listBoxOS.Text = "";
 
         }
-        public void ShowPackages(List<PackageItem> packagesList)
+        public void ShowPackages(List<Package> packagesList)
         {
             // Stelle sicher, dass listBoxPackages die ListBox ist, die du in deiner Form hast.
             listBoxPackages.Items.Clear(); // Bestehende Einträge löschen
@@ -545,7 +622,8 @@ namespace VirtuSphere
             {
                 foreach (var package in packagesList)
                 {
-                    listBoxPackages.Items.Add(package); // Füge jedes Package zur ListBox hinzu
+                    listBoxPackages.Items.Add(package.package_name); // Füge jedes Package zur ListBox hinzu
+
                 }
             }
             else
@@ -564,6 +642,10 @@ namespace VirtuSphere
 
                     listBoxOS.Items.Add(os); // Fügt das OSItem direkt hinzu
                 }
+
+                // wähle den ersten wert aus
+                listBoxOS.SelectedIndex = 0;
+
             }
             else
             {
@@ -589,19 +671,22 @@ namespace VirtuSphere
         }
         public void ShowVLANs(List<VLANItem> vlanList)
         {
-            comboVLAN.Items.Clear();
+            //comboVLAN.Items.Clear();
 
             if (vlanList != null && vlanList.Any())
             {
                 foreach (var vlan in vlanList)
                 {
-                    comboVLAN.Items.Add(vlan); // Fügt das VLANItem direkt hinzu
+                    //comboVLAN.Items.Add(vlan); // Fügt das VLANItem direkt hinzu
+                    comboWDSVlan.Items.Add(vlan);
                 }
             }
             else
             {
-                comboVLAN.Items.Add("Keine VLANs verfügbar.");
+                //comboVLAN.Items.Add("Keine VLANs verfügbar.");
             }
+
+            comboWDSVlan.SelectedIndex = 0;
         }
         private async void SaveVMsinMission_Click(object sender, EventArgs e)
         {
@@ -638,36 +723,41 @@ namespace VirtuSphere
                 if (isSuccess && isSuccess2 && isSuccess3)
                 {
                     MessageBox.Show("Neue VMs: " + vmListToCreate.Count + " - Updated " + vmListToUpdate.Count + " Übertragen und " + vmListToDelete.Count + " gelöscht");
+                    
+
+                    // Leere vmListToCreate, vmListToDelete und vmListToUpdate
+                    vmListToCreate.Clear();
+                    vmListToDelete.Clear();
+                    vmListToUpdate.Clear();
+
+
+                    // lad missionbox neu
+                    missionBox.Text = "";
+                    missionBox.Items.Clear();
+                    List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
+                    ShowMissions(missionsList);
+
+                    // entferne aktuelle auswahl und wähle neu aus
+                    selectMission(missionName + " (" + vms.Count + ")");
+
+                    // Lade ListView1 neu
+                    vms.Clear();
+                    vms = await ApiService.GetVMs(hostname, Token, missionId);
+
+                    if (vms != null && vms.Count > 0)
+                    {
+                        UpdateListView(vms);
+                        EnableInputFields();
+                    }
+
+                    checkStatus();
                 }
                 else
                 {
                     MessageBox.Show("Fehlgeschlagen");
                 }
 
-                // Leere vmListToCreate, vmListToDelete und vmListToUpdate
-                vmListToCreate.Clear();
-                vmListToDelete.Clear();
-                vmListToUpdate.Clear();
 
-
-                // lad missionbox neu
-                missionBox.Text = "";
-                missionBox.Items.Clear();
-                List<MissionItem> missionsList = await ApiService.GetMissions(hostname, Token);
-                ShowMissions(missionsList);
-
-                // entferne aktuelle auswahl und wähle neu aus
-                selectMission(missionName + " (" + vms.Count + ")");
-
-                // Lade ListView1 neu
-                vms.Clear();
-                vms = await ApiService.GetVMs(hostname, Token, missionId);
-
-                if (vms != null && vms.Count > 0)
-                {
-                    UpdateListView(vms);
-                    EnableInputFields();
-                }
             }
             else if (missionBox.Text != "")
             {
@@ -742,27 +832,50 @@ namespace VirtuSphere
             listView1.Items.Clear();
             foreach (var vm in vms)
             {
-                Console.WriteLine("Funktion UpdateListView: " + vm.vm_name);    
+                 Console.WriteLine("Funktion UpdateListView: " + vm.vm_name);
+                string PackagesList = "";
+                string InterfaceList = "";
+
+
+                // prüfe ob vm.packages gefüllt ist und gebe die namen der Packages aus
+                if (vm.packages != null)
+                {
+                    foreach (var package in vm.packages)
+                    {
+                        Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
+                        PackagesList += package.package_name + "; ";
+                    }
+
+
+                    Console.WriteLine("Packages für " + vm.vm_name + ": " + vm.packages);
+                }
+
+                if (vm.interfaces != null)
+                {
+                    foreach (var interface1 in vm.interfaces)
+                    {
+                        Console.WriteLine("Interface für " + vm.vm_name + ": " + interface1.ip);
+                        InterfaceList += interface1.ip + "; ";
+                    }
+
+                    Console.WriteLine("Interfaces für " + vm.vm_name + ": " + InterfaceList);
+                }
 
                 ListViewItem lvi = new ListViewItem(new[] {
-                                vm.vm_name,
-                                vm.vm_hostname,
-                                vm.vm_ip,
-                                vm.vm_subnet,
-                                vm.vm_gateway,
-                                vm.vm_dns1,
-                                vm.vm_dns2,
-                                vm.vm_domain,
-                                vm.vm_vlan,
-                                vm.vm_os,
-                                vm.vm_packages,
-                                vm.vm_status
-                                    });
+                    vm.vm_name,
+                    vm.vm_hostname,
+                    InterfaceList,
+                    vm.vm_domain,
+                    vm.vm_os,
+                    PackagesList,
+                    vm.vm_status
+                }) ;
 
                 lvi.Tag = vm;
 
                 listView1.Items.Add(lvi);
-                listView1.Show(); 
+                listView1.Show();
+                checkStatus();
             }
         }
 
@@ -824,24 +937,6 @@ namespace VirtuSphere
             }
         }
 
-        public class PackageItem
-        {
-            public string package_name { get; set; }
-            public int Id { get; set; }
-
-            public PackageItem(string name, int id)
-            {
-                package_name = name;
-                Id = id;
-            }
-
-            // Die ListBox verwendet ToString(), um den anzuzeigenden Text zu bestimmen.
-            public override string ToString()
-            {
-                return $"{package_name}"; // Format: "OS-Name (ID)"
-            }
-        }
-
         public class VLANItem
         {
             public string vlan_name { get; set; }
@@ -877,16 +972,8 @@ namespace VirtuSphere
                 foreach (ListViewItem item in listView1.Items)
                 {
                     if (vm.vm_name == item.SubItems[0].Text &&
-                        vm.vm_ip == item.SubItems[1].Text &&
-                        vm.vm_subnet == item.SubItems[2].Text &&
-                        vm.vm_gateway == item.SubItems[3].Text &&
-                        vm.vm_dns1 == item.SubItems[4].Text &&
-                        vm.vm_dns2 == item.SubItems[5].Text &&
                         vm.vm_domain == item.SubItems[6].Text &&
-                        vm.vm_vlan == item.SubItems[7].Text &&
-                        vm.vm_os == item.SubItems[8].Text &&
-                        vm.vm_role == item.SubItems[9].Text &&
-                        vm.vm_status == item.SubItems[10].Text)
+                        vm.vm_os == item.SubItems[8].Text)
                     {
                         found = true;
                         break;
@@ -898,7 +985,7 @@ namespace VirtuSphere
                 // Wenn das VM-Objekt nicht in der Liste vms gefunden wurde, gib es in der Konsole aus
                 if (!found)
                 {
-                    Console.WriteLine($"Das VM-Objekt mit den Eigenschaften: {vm.vm_name}, {vm.vm_ip}, {vm.vm_subnet}, {vm.vm_gateway}, {vm.vm_dns1}, {vm.vm_dns2}, {vm.vm_domain}, {vm.vm_vlan}, {vm.vm_os}, {vm.vm_role}, {vm.vm_status} fehlt in der Liste listView1.");
+                    Console.WriteLine($"Das VM-Objekt mit den Eigenschaften: {vm.vm_name}  fehlt in der Liste listView1.");
                 }
                 else { Console.WriteLine(vm.vm_name+" passt."); }
             }
@@ -1088,5 +1175,91 @@ namespace VirtuSphere
         {
 
         }
+
+        private void generatePlaybooks(object sender, EventArgs e)
+        {
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
+            var filePath = Path.Combine(basePath, "Ansible", "createVMs-ESXi.yml");
+
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    AnsibleForm ansibleForm = new AnsibleForm(vms);
+
+                    // createVMs-ESXi
+                    var tempPath = Path.Combine(Path.GetTempPath(), "createVMs-ESXi.yml");
+                    File.Copy(filePath, tempPath, true);
+                    ansibleForm.listFiles.Items.Add(Path.GetFileName(tempPath));
+
+                    // Erstelle serverlist.yml
+                    var serverlistPath = Path.Combine(Path.GetTempPath(), "serverlist.yml");
+                    File.WriteAllText(serverlistPath, "all:\n  hosts:\n    localhost:\n      ansible_connection: local\n");
+                    ansibleForm.listFiles.Items.Add(Path.GetFileName(serverlistPath));
+
+                    // 
+
+
+                    // Liest den Inhalt der Datei
+                    string result = File.ReadAllText(filePath);
+
+                    // Ersetzt Unix- und Mac-Zeilenumbrüche durch Windows-Zeilenumbrüche
+                    result = result.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
+
+
+
+                    // Konfiguration für bessere Formatierung
+                    ansibleForm.txtAnsible.Multiline = true;
+                    ansibleForm.txtAnsible.ScrollBars = ScrollBars.Both;
+                    ansibleForm.txtAnsible.Font = new Font("Consolas", 10);
+
+                    // erfasse Variablen aus Textbox
+                    string esxi_host = txt_hv_ip.Text;
+                    string esxi_user = txt_hv_loginname.Text;
+                    string esxi_password = txt_hv_loginpassword.Text;
+
+
+                    // Ersetze Variablen in der Datei
+                    result = result.Replace("{{esxi_host}}", txt_hv_ip.Text);
+                    result = result.Replace("{{esxi_user}}", txt_hv_loginname.Text);
+                    result = result.Replace("{{esxi_password}}", txt_hv_loginpassword.Text);
+                    result = result.Replace("{{vm_name}}", txtName.Text);
+
+
+                    // Ausgabe in Textbox
+                    ansibleForm.txtAnsible.Text = result;
+
+
+
+                    ansibleForm.Show();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Fehler beim Lesen der Datei: {ex.Message}");
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Datei nicht gefunden: {filePath}");
+            }
+        }
+
+        private void OpenVmeditForm(object sender, EventArgs e)
+        {
+            // Öffne GUI vmedit.cs
+            //vmeditForm vmeditForm = new vmeditForm();
+            VM selectedVM = listView1.SelectedItems[0].Tag as VM; // Cast das Tag zurück zum VM-Objekt
+
+            if (selectedVM != null)
+            {
+                vmeditForm editForm = new vmeditForm(this, selectedVM);
+                editForm.FillListBoxPackages2(this.packageItems);
+
+                // Zeige das Formular an
+                editForm.ShowDialog();
+            }
+
+        }
+
     }
 }
