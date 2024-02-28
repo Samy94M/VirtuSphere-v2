@@ -4,7 +4,7 @@
   vars_files:
     - ./serverlist.yml
   vars:
-    esxi_hostname: "{hypervisor_esxiip}"
+    esxi_hostname: "{{ esxi_hostname }}"
     esxi_username: "{hypervisor_username}"
     esxi_password: "{hypervisor_password}"  
     ansible_username: "{ansible_username}"
@@ -12,9 +12,9 @@
   tasks:
     - name: VMs erstellen basierend auf der Konfigurationsdatei
       community.vmware.vmware_guest:
-        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
-        username: "{{ esxi_configuration[0].esxi_username }}"
-        password: "{{ esxi_configuration[0].esxi_password }}"
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
         validate_certs: no
         name: "{{ vm.vm_name }}"
         state: present
@@ -33,11 +33,8 @@
           secure_boot: true
           boot_firmware: "efi"
         networks:
-          - name: "SIDS_SRV_6_Data"
-            device_type: e1000e
           - name: "{{ vm.network }}"
-            device_type: vmxnet3
-            start_connected: true
+            device_type: e1000e
       delegate_to: localhost
       loop: "{{ vm_configurations }}"
       loop_control:
@@ -48,9 +45,9 @@
     - name: Setze das Hinweisfeld der VM mit Erstellungsdatum, User, Installation und Rollen
       ignore_errors: true
       community.vmware.vmware_guest:
-        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
-        username: "{{ esxi_configuration[0].esxi_username }}"
-        password: "{{ esxi_configuration[0].esxi_password }}"
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
         validate_certs: no
         name: "{{ vm.vm_name }}"
         datacenter: "{{ vm.datacenter_name }}"
@@ -79,9 +76,9 @@
 
     - name: Hole Informationen der erstellten VMs und zeige MAC-Adressen
       community.vmware.vmware_guest_info:
-        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
-        username: "{{ esxi_configuration[0].esxi_username }}"
-        password: "{{ esxi_configuration[0].esxi_password }}"
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
         validate_certs: no
         datacenter: "{{ vm.datacenter_name }}"
         name: "{{ vm.vm_name }}"
@@ -153,9 +150,9 @@
     - name: Starte VM
       ignore_errors: true
       community.vmware.vmware_guest_powerstate:
-        hostname: "{{ esxi_configuration[0].esxi_hostname }}"
-        username: "{{ esxi_configuration[0].esxi_username }}"
-        password: "{{ esxi_configuration[0].esxi_password }}"
+        hostname: "{{ esxi_hostname }}"
+        username: "{{ esxi_username }}"
+        password: "{{ esxi_password }}"
         validate_certs: no
         name: "{{ vm.vm_name }}"
         state: powered-on

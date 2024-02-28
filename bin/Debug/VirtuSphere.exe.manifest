@@ -170,17 +170,17 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>8DSxUjMxmCPBAlrq/cv9D6ZsJ1BZ0RzMJ8aa4y7wL1M=</dsig:DigestValue>
+        <dsig:DigestValue>inAygG2QTe/6ujBQmQnmYizrmq7BFz4GfxKEhKEyItc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Ansible\createVMs-ESXi.yml" size="5757">
+  <file name="Ansible\createVMs-ESXi.yml" size="5390">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>0ciCzablZVpe8zYXGpWLaN303DjHPPcRNz/tM4tY64w=</dsig:DigestValue>
+      <dsig:DigestValue>zpNtv0sB6K7eqEsx4d+dgCahSMLxnM/pkBZPLHDTep0=</dsig:DigestValue>
     </hash>
   </file>
   <file name="banner_3I7_icon.ico" size="151492">
@@ -201,13 +201,13 @@
       <dsig:DigestValue>XtOlClG3p3M0PrRKTGBLwsjP+hH+ibjERnYWqk4BMW4=</dsig:DigestValue>
     </hash>
   </file>
-  <file name="VirtuSphere.exe.config" size="2008">
+  <file name="VirtuSphere.exe.config" size="2000">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>oTMK0myFdhe1q56GgHySB6OH3ZRZaBrKwbsOtGnSn7U=</dsig:DigestValue>
+      <dsig:DigestValue>X/OW+GiKRReqfyLie2fxLU0t8gWn+M0GnvPk7/hksR4=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
